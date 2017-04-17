@@ -22,8 +22,16 @@ terminal			BREAK, DEFAULT, FUNC,
 terminal	String	IDENTIFIER, STRING_LIT, INT_LIT;				
 
 /* Non-terminals */
-nonterminal	String	binary_op, add_op, ArrayType, ArrayLength, Expression,
-					ElementType, TypeName, Type, TypeLit,
+nonterminal	String	binary_op, add_op, unary_op, ArrayType, ArrayLength, Expression, UnaryExpr,
+					PrimaryExpr, Operand, Literal, BasicLit, FunctionLit,
+					Function, FunctionBody,Block, StatementList, Statement, Declaration,
+					ConstDecl,ConstSpec, TypeDecl, TypeSpec, VarDecl, VarSpec, SimpleStmt,
+					ExpressionStmt, IncDecStmt, Assignment, assign_op, ShortVarDecl, IfStmt,
+					SwitchStmt, ExprSwitchStmt, ExprCaseClause, ExprSwitchCase, ForStmt, Condition,
+					ForClause, InitStmt, PostStmt, CompositeLit, LiteralType, LiteralValue,
+					ElementList, KeyedElement, Key, FieldName, Element,
+					OperandName, QualifiedIdent, 
+					MethodExpr, ReceiverType, ElementType, TypeName, Type, TypeLit,
 					SliceType, StructType, FieldDecl, AnonymousField, IdentifierList,
 					Tag, FunctionType, Signature, Result, Parameters, ParameterList, 
 					ParameterDecl, MethodName, PackageName,
@@ -52,6 +60,30 @@ add_op ::= 		PLUS
 				{: 
 						 
 				:};
+unary_op ::= 	PLUS
+				{: 
+				    	 
+				:}
+				| MINUS
+				{: 
+						 
+				:}
+				| EXCLAMATION
+				{: 
+						 
+				:}
+				| ASTRISK
+				{: 
+						 
+				:}
+				| AMBERSAND
+				{: 
+						 
+				:}
+				| LESS_DASH
+				{: 
+						 
+				:};
 ArrayType ::= 	OPEN_SQUARE ArrayLength CLOSE_SQUARE ElementType 
 				{: 
 				    	 
@@ -60,10 +92,302 @@ ArrayLength ::= Expression
 				{: 
 				    	 
 				:};
-Expression ::= STRING_LIT
+Expression ::= UnaryExpr
+				{:
+				
+				:}
+				| Expression binary_op Expression
+				{:
+				:};
+UnaryExpr ::= 	PrimaryExpr
+				{:
+				
+				:}
+				| unary_op UnaryExpr
+				{:
+				:};
+Operand ::= 	Literal
+				{:
+				
+				:}
+				| OperandName
+				{:
+				:}
+				| MethodExpr
+				{:
+				:}
+				| OPEN_PARAN Expression CLOSE_PARAN
+				{:
+				:};
+Literal ::= 	BasicLit
+				{:
+				
+				:}
+				| CompositeLit
+				{:
+				:}
+				| FunctionLit
+				{:
+				:};
+BasicLit ::= 	INT_LIT
+				{:
+				
+				:}
+				| STRING_LIT
+				{:
+				:};
+FunctionLit ::= FUNC Function
 				{:
 				
 				:};
+Function ::= 	Signature FunctionBody
+				{:
+				
+				:};
+FunctionBody ::= Block
+				{:
+				
+				:};
+Block ::= 		OPEN_CURLY StatementList CLOSE_CURLY
+				{:
+				
+				:};
+StatementList ::= Statement
+				{:
+				
+				:};
+Statement ::= 	Declaration
+				{:
+				
+				:}
+				| SimpleStmt SEMI_COLON
+				{:
+				:}
+				| ReturnStmt SEMI_COLON
+				{:
+				:}
+				| BreakStmt SEMI_COLON
+				{:
+				:}
+				| Block SEMI_COLON
+				{:
+				:}
+				| IfStmt SEMI_COLON
+				{:
+				:}
+				| SwitchStmt SEMI_COLON
+				{:
+				:}
+				| ForStmt SEMI_COLON
+				{:
+				:};
+Declaration ::= ConstDecl SEMI_COLON
+				{:
+				
+				:}
+				| TypeDecl SEMI_COLON
+				{:
+				:}
+				| VarDecl SEMI_COLON
+				{:
+				:};
+ConstDecl ::= 	CONST ConstSpec
+				{:
+				
+				:}
+				| CONST OPEN_PARAN ConstSpec SEMI_COLON CLOSE_PARAN
+				{:
+				
+				:};
+ConstSpec ::= 	IDENTIFIER Type EQUAL Expression
+				{:
+				
+				:};
+TypeDecl ::= 	TYPE TypeSpec
+				{:
+				
+				:}
+				| TYPE OPEN_PARAN TypeSpec SEMI_COLON CLOSE_PARAN
+				{:
+				
+				:};
+TypeSpec ::= 	IDENTIFIER Type
+				{:
+				
+				:};
+VarDecl ::= 	VAR VarSpec
+				{:
+				
+				:}
+				| VAR OPEN_PARAN VarSpec SEMI_COLON CLOSE_PARAN
+				{:
+				
+				:};
+VarSpec ::= 	IDENTIFIER Type EQUAL Expression
+				{:
+				
+				:}
+				| IDENTIFIER EQUAL Expression
+				{:
+				
+				:};
+SimpleStmt ::= 	ExpressionStmt
+				{:
+				
+				:}
+				| IncDecStmt
+				{:
+				:}
+				| Assignment
+				{:
+				:}
+				| ShortVarDecl
+				{:
+				:};
+ExpressionStmt ::= Expression
+				{:
+				
+				:};
+IncDecStmt ::= Expression INCREMENT
+				{:
+				
+				:}
+				| Expression DECREMENT
+				{:
+				:};
+Assignment ::= ExpressionList assign_op ExpressionList
+				{:
+				
+				:};
+assign_op ::= 	add_op EQUAL
+				{:
+				
+				:};
+ShortVarDecl ::= IdentifierList COLON_EQUAL Expression
+				{:
+				
+				:};
+IfStmt ::= 		IF SimpleStmt SEMI_COLON Expression Block ELSE IfStmt
+				{:
+				
+				:}
+				| IF SimpleStmt SEMI_COLON Expression Block ELSE Block
+				{:
+				:};
+SwitchStmt ::= 	ExprSwitchStmt
+				{:
+				
+				:};
+ExprSwitchStmt ::= SWITCH SimpleStmt SEMI_COLON Expression OPEN_CURLY ExprCaseClause CLOSE_CURLY
+				{:
+				
+				:};
+ExprCaseClause ::= ExprSwitchCase COLON StatementList
+				{:
+				
+				:};
+ExprSwitchCase ::= CASE ExpressionList
+				{:
+				
+				:}
+				| DEFAULT
+				{:
+				:};
+ForStmt ::= 	FOR Condition Block
+				{:
+				
+				:}
+				| FOR ForClause Block
+				{:
+				:};
+Condition ::= 	Expression
+				{:
+				
+				:};
+ForClause ::= 	InitStmt SEMI_COLON Condition SEMI_COLON PostStmt
+				{:
+				
+				:};
+InitStmt ::= 	SimpleStmt
+				{:
+				
+				:};
+PostStmt ::= 	SimpleStmt
+				{:
+				
+				:};
+CompositeLit ::= LiteralType LiteralValue
+				{:
+				
+				:};
+LiteralType ::= StructType
+				{:
+				
+				:}
+				| ArrayType
+				{:
+				:}
+				| OPEN_SQUARE CDOTS CLOSE_SQUARE ElementType
+				{:
+				:}
+				| SliceType
+				{:
+				:}
+				| TYPE TypeName
+				{:
+				:};
+LiteralValue ::= OPEN_CURLY ElementList CLOSE_CURLY
+				{:
+				
+				:};
+ElementList ::= KeyedElement COMMA KeyedElement
+				{:
+				
+				:};
+KeyedElement ::= Key COLON Element
+				{:
+				
+				:};
+Key ::= 		FieldName
+				{:
+				
+				:}
+				| LiteralValue
+				{:
+				:};
+FieldName ::= 	IDENTIFIER
+				{:
+				
+				:};
+Element ::= 	Expression
+				{:
+				
+				:}
+				| LiteralValue
+				{:
+				:};
+OperandName ::= IDENTIFIER
+				{:
+				
+				:}
+				| QualifiedIdent
+				{:
+				:};
+QualifiedIdent ::= DOT PackageName DOT IDENTIFIER 
+				{: 
+				    	 
+				:};
+MethodExpr     ::= DOT ReceiverType DOT MethodName 
+				{: 
+				    	 
+				:};
+ReceiverType ::= OPEN_PARAN ASTRISK TypeName CLOSE_PARAN
+				{:
+				
+				:}
+				| OPEN_PARAN TypeName CLOSE_PARAN
+				{:
+				:};				
 ElementType ::= Type 
 				{: 
 				    	 
@@ -167,7 +491,7 @@ ImportPath ::= 	STRING_LIT
 				{: 
 				    	 
 				:};
-ImportSpec ::= 	ImportPath
+ImportSpec ::= 	DOT ImportPath
 				{: 
 				    	 
 				:}
@@ -179,7 +503,7 @@ ImportDecl ::= 	IMPORT ImportSpec
 				{: 
 				    	 
 				:}
-				|	IMPORT OPEN_PARAN ImportSpec CLOSE_PARAN
+				|	IMPORT OPEN_PARAN ImportSpec SEMI_COLON CLOSE_PARAN
 				{: 
 				    	 
 				:};
@@ -191,7 +515,7 @@ ReturnStmt ::= 	RETURN ExpressionList
 				{: 
 				    	 
 				:};
-ExpressionList ::= 	STRING_LIT 
+ExpressionList ::= 	Expression COMMA Expression 
 				{: 
 				    	 
 				:};
