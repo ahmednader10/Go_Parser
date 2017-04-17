@@ -1,0 +1,197 @@
+import java.io.*;
+import java_cup.runtime.*;
+
+/*
+parser code {:
+:};*/
+	
+/* Terminals (tokens returned by the scanner). */
+terminal			BREAK, DEFAULT, FUNC, 
+					CASE,STRUCT, ELSE, PACKAGE,
+					SWITCH, CONST, IF, TYPE,
+					FOR, IMPORT, RETURN, VAR,
+					OR_OP, AND_OP, REL_OP,
+					PLUS, MINUS, OPEN_PARAN,
+					CLOSE_PARAN, OPEN_CURLY, CLOSE_CURLY,
+					OPEN_SQUARE, CLOSE_SQUARE, SEMI_COLON,
+					COMMA, DOT, COLON, COLON_EQUAL, EQUAL,
+					CDOTS, ASTRISK, SHIFT_LEFT, SHIFT_RIGHT,
+					BAR, SLASH, EXCLAMATION, LESS_DASH, 
+					AMBERSAND, PERCENT, INCREMENT, DECREMENT, SPACE,
+					NEWLINE, ERROR;
+terminal	String	IDENTIFIER, STRING_LIT, INT_LIT;				
+
+/* Non-terminals */
+nonterminal	String	binary_op, add_op, ArrayType, ArrayLength, Expression,
+					ElementType, TypeName, Type, TypeLit,
+					SliceType, StructType, FieldDecl, AnonymousField, IdentifierList,
+					Tag, FunctionType, Signature, Result, Parameters, ParameterList, 
+					ParameterDecl, MethodName, PackageName,
+					PackageClause, ImportPath, ImportSpec, ImportDecl, BreakStmt,
+					ReturnStmt, ExpressionList;
+
+
+/* The grammar */
+binary_op ::= 	OR_OP
+				{: 
+				     
+				:}
+				| AND_OP
+				{: 
+						 
+				:}
+				| REL_OP
+				{: 
+						 
+				:};
+add_op ::= 		PLUS
+				{: 
+				    	 
+				:}
+				| MINUS
+				{: 
+						 
+				:};
+ArrayType ::= 	OPEN_SQUARE ArrayLength CLOSE_SQUARE ElementType 
+				{: 
+				    	 
+				:};
+ArrayLength ::= Expression 
+				{: 
+				    	 
+				:};
+Expression ::= STRING_LIT
+				{:
+				
+				:};
+ElementType ::= Type 
+				{: 
+				    	 
+				:};
+TypeName ::= 	IDENTIFIER
+				{: 
+				    	 
+				:};
+Type ::= 		TypeName
+				{: 
+				    	 
+				:}
+				| TypeLit
+				{:
+				:};
+TypeLit ::= 	ArrayType
+				{: 
+				    	 
+				:}
+				| StructType
+				{:
+				
+				:}
+				| FunctionType
+				{: 
+				    	 
+				:}
+				| SliceType
+				{:
+				
+				:};
+SliceType ::= 	OPEN_SQUARE CLOSE_SQUARE ElementType
+				{: 
+				    	 
+				:};
+StructType ::= 	STRUCT OPEN_CURLY FieldDecl CLOSE_CURLY
+				{: 
+				    	 
+				:};
+FieldDecl ::= 	IdentifierList Type Tag
+				{: 
+				    	 
+				:}
+				| AnonymousField Tag
+				{:
+				
+				:};
+IdentifierList ::= 	IDENTIFIER COMMA IDENTIFIER
+				{: 
+				    	 
+				:};
+AnonymousField ::= 	ASTRISK TypeName
+				{: 
+				    	 
+				:};
+Tag ::= 		STRING_LIT
+				{: 
+				    	 
+				:};
+FunctionType ::= FUNC Signature
+				{: 
+				    	 
+				:};
+Signature ::= Parameters Result
+				{: 
+				    	 
+				:};
+Result ::= 	Parameters
+				{: 
+				    	 
+				:}
+				| OPEN_PARAN Type CLOSE_PARAN
+				{:
+				
+				:};
+Parameters ::= OPEN_PARAN ParameterList CLOSE_PARAN
+				{: 
+				    	 
+				:};
+ParameterList ::= ParameterDecl ParameterList CLOSE_PARAN
+				{: 
+				    	 
+				:};
+ParameterDecl ::= IdentifierList CDOTS Type
+				{: 
+				    	 
+				:};
+MethodName ::= 	IDENTIFIER
+				{: 
+				    	 
+				:};
+PackageName ::= IDENTIFIER
+				{: 
+				    	 
+				:};
+PackageClause ::= PACKAGE PackageName
+				{: 
+				    	 
+				:};
+ImportPath ::= 	STRING_LIT 
+				{: 
+				    	 
+				:};
+ImportSpec ::= 	ImportPath
+				{: 
+				    	 
+				:}
+				|	PackageName ImportPath
+				{: 
+				    	 
+				:};
+ImportDecl ::= 	IMPORT ImportSpec
+				{: 
+				    	 
+				:}
+				|	IMPORT OPEN_PARAN ImportSpec CLOSE_PARAN
+				{: 
+				    	 
+				:};
+BreakStmt ::= 	BREAK 
+				{: 
+				    	 
+				:};
+ReturnStmt ::= 	RETURN ExpressionList 
+				{: 
+				    	 
+				:};
+ExpressionList ::= 	STRING_LIT 
+				{: 
+				    	 
+				:};

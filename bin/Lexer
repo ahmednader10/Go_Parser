@@ -1,0 +1,247 @@
+
+import java.lang.System;
+import java.io.*;
+import java_cup.runtime.Symbol;
+import java.util.Stack;
+%%
+%class Lexer
+
+%implements java_cup.runtime.Scanner
+%function next_token
+%type java_cup.runtime.Symbol
+%char
+%line
+%state open
+
+
+%{
+	//initialize  variables to be used by class
+	public Stack stack = new Stack();
+	public int lineCount = 1;
+%}
+
+
+%init{
+
+//Add code to be executed on initialization of the lexer)
+stack.push("$");
+
+%init}
+
+
+NEWLINE=[\r\n]
+SPACE=[\ \t\b] 
+UNICODELETTER=([a-zA-Z])
+UNDERSCORE=(\_)
+LETTER=(UNICODELETTER|UNDERSCORE)
+UNICODEDIGIT=([0-9])
+COMMENT=(\/\/(.)*)
+BREAK=(break)
+DEFAULT=(default)
+FUNC=(func)
+CASE=(case)
+STRUCT=(struct)
+ELSE=(else)
+PACKAGE=(package)
+SWITCH=(switch)
+CONST=(const)
+IF=(if)
+TYPE=(type)
+FOR=(for)
+IMPORT=(import)
+RETURN=(return)
+VAR=(var)
+OR=(\|\|)
+AND=(&&)
+EQUALREL=(\=\=)
+NOTEQUALREL=(\!\=)
+LESSTHANREL=(\<)
+LESSTHANOREQUALREL=(\<\=)
+GREATERTHANREL=(\>)
+GREATERTHANOREQUALREL=(\>\=)
+RELOP=({EQUALREL}|{NOTEQUALREL}|{LESSTHANREL}|{LESSTHANOREQUALREL}|{GREATERTHANREL}|{GREATERTHANOREQUALREL}) 
+INTLIT=([1-9]([0-9])*|0)
+ADDOP=(\+)
+SUBOP=(\-)
+ADDALL=({ADDOP}|{SUBOP})
+MULOP=(\*)
+MODOP=(\%)
+SHIFTLEFTOP=(\<\<)
+SHIFTRIGHTOP=(\>\>)
+//MULALL=MULOP|MODOP|SHIFTLEFTOP|SHIFTRIGHTOP
+//BINOP=OR|AND|RELOP|ADDALL|MULALL
+RAWSTRINGLIT=(`([^\n\`]|(\n))*`)
+INTERPRETEDSTRINGLIT=(\"(([^\n\"]|(\\[abfnrtv\\\'\"]))+)\")
+STRINGLIT=({RAWSTRINGLIT}|{INTERPRETEDSTRINGLIT})
+OPENPARAN=(\()
+CLOSEPARAN=(\))
+OPENCURLY=(\{)
+CLOSECURLY=(\})
+OPENSQUARE=(\[)
+CLOSESQUARE=(\])
+SEMICOLON=(\;)
+COMMA=(\,)
+DOT=(\.)
+COLON=(\:)
+COLONEQUAL=(\:=)
+EQUAL=(\=)
+ASTRISK=(\*)
+EXCLAMATION=(\!)
+CDOTS=(\.\.\.)
+LESSDASH=(\<\-)
+AMBERSAND=(\&)
+PERCENT=(\%)
+INC=(\+\+)
+DEC=(\-\-)
+BAR=(\|)
+SLASH=(\/)
+IDENTIFIER=([a-zA-Z_]([a-zA-Z_0-9])*)
+
+
+%eofval{
+//Add code to be executed when the end of the file is reached
+String topValue = (String)stack.pop();
+if(!topValue.equals("$")) {
+	if (topValue.equals("(")){
+		return (new Symbol(sym.EOF,"There is some ( that is not closed"));
+	}
+	if (topValue.equals("{")){
+		return (new Symbol(sym.EOF,"There is some { that is not closed"));
+	}
+	if (topValue.equals("[")){
+		return (new Symbol(sym.EOF,"There is some [ that is not closed"));
+	}
+}
+return (new Symbol(sym.EOF,"Done"));
+%eofval}
+
+%% 
+<YYINITIAL,open> {SPACE} {}
+<YYINITIAL,open> {NEWLINE} {lineCount++;}
+<YYINITIAL,open> {COMMENT} {}
+<YYINITIAL,open> {BREAK} {return (new Symbol(sym.BREAK,yytext()));}
+<YYINITIAL,open> {DEFAULT} {return (new Symbol(sym.DEFAULT,yytext()));}
+<YYINITIAL,open> {FUNC} {return (new Symbol(sym.FUNC,yytext()));}
+<YYINITIAL,open> {CASE} {return (new Symbol(sym.CASE,yytext()));}
+<YYINITIAL,open> {STRUCT} {return (new Symbol(sym.STRUCT,yytext()));}
+<YYINITIAL,open> {ELSE} {return (new Symbol(sym.ELSE,yytext()));}
+<YYINITIAL,open> {PACKAGE} {return (new Symbol(sym.PACKAGE,yytext()));}
+<YYINITIAL,open> {SWITCH} {return (new Symbol(sym.SWITCH,yytext()));}
+<YYINITIAL,open> {CONST} {return (new Symbol(sym.CONST,yytext()));}
+<YYINITIAL,open> {IF} {return (new Symbol(sym.IF,yytext()));}
+<YYINITIAL,open> {TYPE} {return (new Symbol(sym.TYPE,yytext()));}
+<YYINITIAL,open> {FOR} {return (new Symbol(sym.FOR,yytext()));}
+<YYINITIAL,open> {IMPORT} {return (new Symbol(sym.IMPORT,yytext()));}
+<YYINITIAL,open> {RETURN} {return (new Symbol(sym.RETURN,yytext()));}
+<YYINITIAL,open> {VAR} {return (new Symbol(sym.VAR,yytext()));}
+<YYINITIAL,open> {OR} {return (new Symbol(sym.OR_OP,yytext()));}
+<YYINITIAL,open> {AND} {return (new Symbol(sym.AND_OP,yytext()));}
+<YYINITIAL,open> {RELOP} {return (new Symbol(sym.REL_OP,yytext()));}
+<YYINITIAL,open> {INTLIT} {return (new Symbol(sym.INT_LIT,yytext()));}
+<YYINITIAL,open> {ADDOP} {return (new Symbol(sym.PLUS,yytext()));}
+<YYINITIAL,open> {SUBOP} {return (new Symbol(sym.MINUS,yytext()));}
+<YYINITIAL,open> {STRINGLIT} {return (new Symbol(sym.STRING_LIT,yytext()));}
+<YYINITIAL,open> {OPENPARAN} {
+		stack.push("(");
+		yybegin(open);
+		return (new Symbol(sym.OPEN_PARAN,yytext()));
+}
+<open> {CLOSEPARAN} {
+		String topValue = (String)stack.pop();
+		if (topValue.equals("(")){
+			if (((String)stack.peek()).equals("$")) {
+				yybegin(YYINITIAL);
+			}
+			return (new Symbol(sym.CLOSE_PARAN,yytext()));
+		}
+		else {
+			String top = (String)stack.peek();
+			if (top.equals("(")) {
+				stack.push(topValue);
+				return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+			}
+			else {
+				stack.push(topValue);
+				return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+			}
+		}
+		
+}
+<YYINITIAL> {CLOSEPARAN} {return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));}
+<YYINITIAL,open> {OPENCURLY} {
+		stack.push("{");
+		yybegin(open);
+		return (new Symbol(sym.OPEN_CURLY,yytext()));
+}
+<open> {CLOSECURLY} {
+		String topValue = (String)stack.pop();
+		if (topValue.equals("{")){
+			if (((String)stack.peek()).equals("$")) {
+				yybegin(YYINITIAL);
+			}
+			return (new Symbol(sym.CLOSE_CURLY,yytext()));
+		}
+		else {
+			String top = (String)stack.peek();
+			if (top.equals("{")) {
+				stack.push(topValue);
+				return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+			}
+			else {
+				stack.push(topValue);
+				return (new Symbol(sym.ERROR,"} has no matching { in line "+lineCount));
+			}
+		}
+		
+}
+<YYINITIAL> {CLOSECURLY} {return (new Symbol(sym.ERROR,"} has no matching { in line "+lineCount));}
+<YYINITIAL,open> {OPENSQUARE} {
+		stack.push("[");
+		yybegin(open);
+		return (new Symbol(sym.OPEN_SQUARE,yytext()));
+}
+<open> {CLOSESQUARE} {
+		String topValue = (String)stack.pop();
+		if (topValue.equals("[")){
+			if (((String)stack.peek()).equals("$")) {
+				yybegin(YYINITIAL);
+			}
+			return (new Symbol(sym.CLOSE_SQUARE,yytext()));
+		}
+		else {
+			String top = (String)stack.peek();
+			if (top.equals("[")) {
+				stack.push(topValue);
+				return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+			}
+			else {
+				stack.push(topValue);
+				return (new Symbol(sym.ERROR,"] has no matching [ in line "+lineCount));
+			}
+		}
+		
+}
+<YYINITIAL> {CLOSESQUARE} {return (new Symbol(sym.ERROR,"] has no matching [ in line "+lineCount));}
+<YYINITIAL,open> {SEMICOLON} {return (new Symbol(sym.SEMI_COLON,yytext()));}
+<YYINITIAL,open> {COMMA} {return (new Symbol(sym.COMMA,yytext()));}
+<YYINITIAL,open> {DOT} {return (new Symbol(sym.DOT,yytext()));}
+<YYINITIAL,open> {COLON} {return (new Symbol(sym.COLON,yytext()));}
+<YYINITIAL,open> {COLONEQUAL} {return (new Symbol(sym.COLON_EQUAL,yytext()));}
+<YYINITIAL,open> {EQUAL} {return (new Symbol(sym.EQUAL,yytext()));}
+<YYINITIAL,open> {ASTRISK} {return (new Symbol(sym.ASTRISK,yytext()));}
+<YYINITIAL,open> {SHIFTLEFTOP} {return (new Symbol(sym.SHIFT_LEFT,yytext()));}
+<YYINITIAL,open> {SHIFTRIGHTOP} {return (new Symbol(sym.SHIFT_RIGHT,yytext()));}
+<YYINITIAL,open> {EXCLAMATION} {return (new Symbol(sym.EXCLAMATION,yytext()));}
+<YYINITIAL,open> {PERCENT} {return (new Symbol(sym.PERCENT,yytext()));}
+<YYINITIAL,open> {CDOTS} {return (new Symbol(sym.CDOTS,yytext()));}
+<YYINITIAL,open> {LESSDASH} {return (new Symbol(sym.LESS_DASH,yytext()));}
+<YYINITIAL,open> {AMBERSAND} {return (new Symbol(sym.AMBERSAND,yytext()));}
+<YYINITIAL,open> {INC} {return (new Symbol(sym.INCREMENT,yytext()));}
+<YYINITIAL,open> {DEC} {return (new Symbol(sym.DECREMENT,yytext()));}
+<YYINITIAL,open> {BAR} {return (new Symbol(sym.BAR,yytext()));}
+<YYINITIAL,open> {SLASH} {return (new Symbol(sym.SLASH,yytext()));}
+<YYINITIAL,open> {IDENTIFIER} {return (new Symbol(sym.IDENTIFIER,yytext()));}
+<YYINITIAL,open> . {
+  return (new Symbol(sym.ERROR, "Invalid input: " + yytext()+" in line "+lineCount));
+}
+
