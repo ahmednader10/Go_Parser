@@ -415,17 +415,21 @@ stack.push("$");
 			if (YY_EOF == yy_lookahead && true == yy_initial) {
 
 //Add code to be executed when the end of the file is reached
-String topValue = (String)stack.pop();
-if(!topValue.equals("$")) {
-	if (topValue.equals("(")){
-		return (new Symbol(sym.EOF,"There is some ( that is not closed"));
+System.out.println(stack.isEmpty());
+if(!stack.isEmpty()) {
+	String topValue = (String)stack.pop();
+	if(!topValue.equals("$")) {
+		if (topValue.equals("(")){
+			return (new Symbol(sym.EOF,"There is some ( that is not closed"));
+		}
+		if (topValue.equals("{")){
+			return (new Symbol(sym.EOF,"There is some { that is not closed"));
+		}
+		if (topValue.equals("[")){
+			return (new Symbol(sym.EOF,"There is some [ that is not closed"));
+		}
 	}
-	if (topValue.equals("{")){
-		return (new Symbol(sym.EOF,"There is some { that is not closed"));
-	}
-	if (topValue.equals("[")){
-		return (new Symbol(sym.EOF,"There is some [ that is not closed"));
-	}
+	return (new Symbol(sym.EOF,"Done"));
 }
 return (new Symbol(sym.EOF,"Done"));
 			}
@@ -673,69 +677,99 @@ return (new Symbol(sym.EOF,"Done"));
 						break;
 					case 53:
 						{
-		String topValue = (String)stack.pop();
-		if (topValue.equals("(")){
-			if (((String)stack.peek()).equals("$")) {
-				yybegin(YYINITIAL);
-			}
-			return (new Symbol(sym.CLOSE_PARAN,yytext()));
-		}
-		else {
-			String top = (String)stack.peek();
-			if (top.equals("(")) {
-				stack.push(topValue);
-				return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+		if(!stack.isEmpty()) {
+			String topValue = (String)stack.pop();
+			if (topValue.equals("(")){
+				if (!stack.isEmpty() && ((String)stack.peek()).equals("$")) {
+					yybegin(YYINITIAL);
+				}
+				return (new Symbol(sym.CLOSE_PARAN,yytext()));
 			}
 			else {
-				stack.push(topValue);
-				return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+				if (!stack.isEmpty()) {
+					String top = (String)stack.peek();
+					if (top.equals("(")) {
+						stack.push(topValue);
+						return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+					}
+					else {
+						stack.push(topValue);
+						return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+					}
+				}
+				else {
+					return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+				}
 			}
+		}
+		else {
+			return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
 		}
 }
 					case -54:
 						break;
 					case 54:
 						{
-		String topValue = (String)stack.pop();
-		if (topValue.equals("{")){
-			if (((String)stack.peek()).equals("$")) {
-				yybegin(YYINITIAL);
-			}
-			return (new Symbol(sym.CLOSE_CURLY,yytext()));
-		}
-		else {
-			String top = (String)stack.peek();
-			if (top.equals("{")) {
-				stack.push(topValue);
-				return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+		if(!stack.isEmpty()) {
+			String topValue = (String)stack.pop();
+			if (topValue.equals("{")){
+				if (!stack.isEmpty() && ((String)stack.peek()).equals("$")) {
+					yybegin(YYINITIAL);
+				}
+				return (new Symbol(sym.CLOSE_PARAN,yytext()));
 			}
 			else {
-				stack.push(topValue);
-				return (new Symbol(sym.ERROR,"} has no matching { in line "+lineCount));
+				if (!stack.isEmpty()) {
+					String top = (String)stack.peek();
+					if (top.equals("{")) {
+						stack.push(topValue);
+						return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+					}
+					else {
+						stack.push(topValue);
+						return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+					}
+				}
+				else {
+					return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+				}
 			}
+		}
+		else {
+			return (new Symbol(sym.ERROR,"} has no matching { in line "+lineCount));
 		}
 }
 					case -55:
 						break;
 					case 55:
 						{
-		String topValue = (String)stack.pop();
-		if (topValue.equals("[")){
-			if (((String)stack.peek()).equals("$")) {
-				yybegin(YYINITIAL);
-			}
-			return (new Symbol(sym.CLOSE_SQUARE,yytext()));
-		}
-		else {
-			String top = (String)stack.peek();
-			if (top.equals("[")) {
-				stack.push(topValue);
-				return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+		if(!stack.isEmpty()) {
+			String topValue = (String)stack.pop();
+			if (topValue.equals("[")){
+				if (!stack.isEmpty() && ((String)stack.peek()).equals("$")) {
+					yybegin(YYINITIAL);
+				}
+				return (new Symbol(sym.CLOSE_PARAN,yytext()));
 			}
 			else {
-				stack.push(topValue);
-				return (new Symbol(sym.ERROR,"] has no matching [ in line "+lineCount));
+				if (!stack.isEmpty()) {
+					String top = (String)stack.peek();
+					if (top.equals("[")) {
+						stack.push(topValue);
+						return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+					}
+					else {
+						stack.push(topValue);
+						return (new Symbol(sym.ERROR,"] has no matching [ in line "+lineCount));
+					}
+				}
+				else {
+					return (new Symbol(sym.ERROR,"] has no matching [ in line "+lineCount));
+				}
 			}
+		}
+		else {
+			return (new Symbol(sym.ERROR,"} has no matching { in line "+lineCount));
 		}
 }
 					case -56:
