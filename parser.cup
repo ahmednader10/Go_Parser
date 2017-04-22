@@ -62,6 +62,14 @@ precedence left FUNC;
 start with SourceFile;
 
 /* The grammar */
+SourceFile ::= PackageClause SEMI_COLON import_decl_zero_more  top_level_zero_more
+				{:
+					System.out.println("semi colon");
+				:}
+				|PackageClause import_decl_zero_more  top_level_zero_more 
+				{:
+					System.out.println("without semi colon");
+				:};
 binary_op ::= 	OR_OP
 				{: 
 				     
@@ -803,14 +811,6 @@ top_level_zero_more ::= {: :} | TopLevelDecl top_level_zero_more {: :};
 BreakStmt ::= 	BREAK 
 				{: 
 				    	 
-				:};
-SourceFile ::= PackageClause SEMI_COLON import_decl_zero_more  top_level_zero_more
-				{:
-					System.out.println("semi colon");
-				:}
-				|PackageClause import_decl_zero_more  top_level_zero_more 
-				{:
-					System.out.println("without semi colon");
 				:};
 ReturnStmt ::= 	RETURN ExpressionList 
 				{: 
