@@ -164,24 +164,24 @@ return (new Symbol(sym.EOF,"Done"));
 					String top = (String)stack.peek();
 					if (top.equals("(")) {
 						stack.push(topValue);
-						return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+						return (new Symbol(sym.error,"You have a missing bracket in line "+lineCount));
 					}
 					else {
 						stack.push(topValue);
-						return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+						return (new Symbol(sym.error,") has no matching ( in line "+lineCount));
 					}
 				}
 				else {
-					return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+					return (new Symbol(sym.error,") has no matching ( in line "+lineCount));
 				}
 			}
 		}
 		else {
-			return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+			return (new Symbol(sym.error,") has no matching ( in line "+lineCount));
 		}
 		
 }
-<YYINITIAL> {CLOSEPARAN} {return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));}
+<YYINITIAL> {CLOSEPARAN} {return (new Symbol(sym.error,") has no matching ( in line "+lineCount));}
 <YYINITIAL,open> {OPENCURLY} {
 		stack.push("{");
 		yybegin(open);
@@ -194,31 +194,31 @@ return (new Symbol(sym.EOF,"Done"));
 				if (!stack.isEmpty() && ((String)stack.peek()).equals("$")) {
 					yybegin(YYINITIAL);
 				}
-				return (new Symbol(sym.CLOSE_PARAN,yytext()));
+				return (new Symbol(sym.CLOSE_CURLY,yytext()));
 			}
 			else {
 				if (!stack.isEmpty()) {
 					String top = (String)stack.peek();
 					if (top.equals("{")) {
 						stack.push(topValue);
-						return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+						return (new Symbol(sym.error,"You have a missing bracket in line "+lineCount));
 					}
 					else {
 						stack.push(topValue);
-						return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+						return (new Symbol(sym.error,") has no matching ( in line "+lineCount));
 					}
 				}
 				else {
-					return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+					return (new Symbol(sym.error,") has no matching ( in line "+lineCount));
 				}
 			}
 		}
 		else {
-			return (new Symbol(sym.ERROR,"} has no matching { in line "+lineCount));
+			return (new Symbol(sym.error,"} has no matching { in line "+lineCount));
 		}
 		
 }
-<YYINITIAL> {CLOSECURLY} {return (new Symbol(sym.ERROR,"} has no matching { in line "+lineCount));}
+<YYINITIAL> {CLOSECURLY} {return (new Symbol(sym.error,"} has no matching { in line "+lineCount));}
 <YYINITIAL,open> {OPENSQUARE} {
 		stack.push("[");
 		yybegin(open);
@@ -231,31 +231,31 @@ return (new Symbol(sym.EOF,"Done"));
 				if (!stack.isEmpty() && ((String)stack.peek()).equals("$")) {
 					yybegin(YYINITIAL);
 				}
-				return (new Symbol(sym.CLOSE_PARAN,yytext()));
+				return (new Symbol(sym.CLOSE_SQUARE,yytext()));
 			}
 			else {
 				if (!stack.isEmpty()) {
 					String top = (String)stack.peek();
 					if (top.equals("[")) {
 						stack.push(topValue);
-						return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+						return (new Symbol(sym.error,"You have a missing bracket in line "+lineCount));
 					}
 					else {
 						stack.push(topValue);
-						return (new Symbol(sym.ERROR,"] has no matching [ in line "+lineCount));
+						return (new Symbol(sym.error,"] has no matching [ in line "+lineCount));
 					}
 				}
 				else {
-					return (new Symbol(sym.ERROR,"] has no matching [ in line "+lineCount));
+					return (new Symbol(sym.error,"] has no matching [ in line "+lineCount));
 				}
 			}
 		}
 		else {
-			return (new Symbol(sym.ERROR,"} has no matching { in line "+lineCount));
+			return (new Symbol(sym.error,"} has no matching { in line "+lineCount));
 		}
 		
 }
-<YYINITIAL> {CLOSESQUARE} {return (new Symbol(sym.ERROR,"] has no matching [ in line "+lineCount));}
+<YYINITIAL> {CLOSESQUARE} {return (new Symbol(sym.error,"] has no matching [ in line "+lineCount));}
 <YYINITIAL,open> {SEMICOLON} {return (new Symbol(sym.SEMI_COLON,yytext()));}
 <YYINITIAL,open> {COMMA} {return (new Symbol(sym.COMMA,yytext()));}
 <YYINITIAL,open> {DOT} {return (new Symbol(sym.DOT,yytext()));}
@@ -276,5 +276,5 @@ return (new Symbol(sym.EOF,"Done"));
 <YYINITIAL,open> {SLASH} {return (new Symbol(sym.SLASH,yytext()));}
 <YYINITIAL,open> {IDENTIFIER} {return (new Symbol(sym.IDENTIFIER,yytext()));}
 <YYINITIAL,open> . {
-  return (new Symbol(sym.ERROR, "Invalid input: " + yytext()+" in line "+lineCount));
+  return (new Symbol(sym.error, "Invalid input: " + yytext()+" in line "+lineCount));
 }

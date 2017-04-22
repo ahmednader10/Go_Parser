@@ -17,7 +17,7 @@ terminal			BREAK, DEFAULT, FUNC,
 					OPEN_SQUARE, CLOSE_SQUARE, SEMI_COLON,
 					COMMA, DOT, COLON, COLON_EQUAL, EQUAL,
 					CDOTS, ASTRISK, SHIFT_LEFT, SHIFT_RIGHT,
-					BAR, SLASH, EXCLAMATION, LESS_DASH, ERROR,
+					BAR, SLASH, EXCLAMATION, LESS_DASH,
 					AMBERSAND, PERCENT, INCREMENT, DECREMENT;
 terminal	String	IDENTIFIER, STRING_LIT, INT_LIT,REL_OP;				
 
@@ -43,20 +43,19 @@ nonterminal	String	binary_op, add_op, mul_op, unary_op, ArrayType, ArrayLength, 
 					PackageClause, ImportPath, ImportSpec, import_spec_zero_more,
 					 top_level_zero_more, import_decl_zero_more,
 					 ImportDecl, BreakStmt, SourceFile,
-					ReturnStmt, expression_zero_more, ExpressionList;
+					ReturnStmt, expression_zero_more, ExpressionList, OpSC;
 
 /* REL_OP,
 			ASTRISK, SHIFT_LEFT, SHIFT_RIGHT,
 					BAR, SLASH, EXCLAMATION, LESS_DASH, 
 					AMBERSAND, PERCENT, INCREMENT, DECREMENT		PLUS, MINUS, */
 
-precedence left SEMI_COLON;
-precedence left COMMA;
+
+precedence left COMMA, SEMI_COLON;
 precedence left OPEN_PARAN;
 precedence left REL_OP, AND_OP, OR_OP;
 precedence left PLUS, MINUS, BAR;
 precedence left ASTRISK, PERCENT, SLASH, SHIFT_LEFT, SHIFT_RIGHT, AMBERSAND;
-precedence left FUNC;
 
 
 start with SourceFile;
@@ -267,81 +266,61 @@ FunctionBody ::= Block
 				:};
 Block ::= 		OPEN_CURLY StatementList CLOSE_CURLY
 				{:
-				
+				System.out.println("BLOCK");
 				:};
-StatementList ::= Statement_zero_more
+StatementList ::= Statement StatementList
 				{:
-				
-				:};
-Statement_zero_more ::= {: :} | Statement Statement_zero_more {: :};
+					System.out.println("statement list");
+				:}| {: System.out.println("Statement empty"); :} ;
+Statement_zero_more ::= Statement Statement_zero_more {: :} | {: System.out.println("Statement empty"); :} ;
 Statement ::= 	Declaration
 				{:
-					System.out.println("statement");
+					System.out.println("DECL statement");
 				:}
 				| SimpleStmt SEMI_COLON
 				{:
 				:}
 				| ReturnStmt SEMI_COLON
 				{:
+					System.out.println("RETURN statement");
 				:}
 				| BreakStmt SEMI_COLON
-				{:
-				:}
-				| Block SEMI_COLON
 				{:
 				:}
 				| Block
 				{:
 				:}
-				| IfStmt SEMI_COLON
-				{:
-				:}
 				| IfStmt
-				{:
-				:}
-				| SwitchStmt SEMI_COLON
 				{:
 				:}
 				| SwitchStmt
 				{:
 				:}
-				| ForStmt SEMI_COLON
-				{:
-				:}
 				| ForStmt
 				{:
 				:};
+OpSC	::=	| SEMI_COLON;				
 Declaration ::= ConstDecl SEMI_COLON
 				{:
-				
+					System.out.println("ConstDecl");
 				:}
-				| TypeDecl SEMI_COLON
-				{:
-				:}
-				| TypeDecl
+				| TypeDecl OpSC
 				{:
 				:}
 				| VarDecl SEMI_COLON
 				{:
+					System.out.println("VarDecl");	
 				:};
 TopLevelDecl ::= Declaration
 				{:
 					System.out.println("declaration from top level decl");
 				:}
-				| FunctionDecl SEMI_COLON
+				| FunctionDecl OpSC
 				{:
 					System.out.println("function declaration from top level decl with semi colon");
 				:}
-				| FunctionDecl
+				| MethodDecl OpSC
 				{:
-					System.out.println("function declaration from top level decl");
-				:}
-				| MethodDecl SEMI_COLON
-				{:
-				:}
-				| MethodDecl
-				{:
-					System.out.println("method declaration from top level decl");
 				:};
 MethodDecl ::= FUNC Receiver MethodName Function 
 				{:
@@ -356,11 +335,11 @@ Receiver ::= Parameters
 			:};
 FunctionDecl ::= FUNC FunctionName Function
 				{:
-					System.out.println("function decl");
+					System.out.println("function decl 2");
 				:}
 				| FUNC FunctionName Signature
 				{:
-					System.out.println("function decl");
+					System.out.println("function decl 1");
 				:};
 FunctionName ::= IDENTIFIER:i
 				{:
@@ -374,7 +353,7 @@ ConstDecl ::= 	CONST ConstSpec
 				{:
 				
 				:};
-const_spec_zero_more ::= {: :} | ConstSpec SEMI_COLON const_spec_zero_more {: :};
+const_spec_zero_more ::= ConstSpec SEMI_COLON const_spec_zero_more {: :} | ;
 ConstSpec ::= 	IDENTIFIER Type EQUAL Expression
 				{:
 				
@@ -395,7 +374,7 @@ TypeDecl ::= 	TYPE TypeSpec
 				{:
 				
 				:};
-type_spec_zero_more ::= {: :} | TypeSpec SEMI_COLON type_spec_zero_more {: :};
+type_spec_zero_more ::= TypeSpec SEMI_COLON type_spec_zero_more {: :} | ;
 TypeSpec ::= 	IDENTIFIER Type
 				{:
 				
@@ -408,7 +387,7 @@ VarDecl ::= 	VAR VarSpec
 				{:
 				
 				:};
-var_spec_zero_more ::= {: :} | VarSpec SEMI_COLON var_spec_zero_more {: :};
+var_spec_zero_more ::= VarSpec SEMI_COLON var_spec_zero_more {: :} | ;
 VarSpec ::= 	IDENTIFIER Type EQUAL Expression
 				{:
 				
@@ -456,7 +435,8 @@ assign_op ::= 	add_op EQUAL
 				| mul_op EQUAL
 				{:
 				
-				:};
+				:}
+				| EQUAL;
 ShortVarDecl ::= IdentifierList COLON_EQUAL Expression
 				{:
 				
@@ -502,7 +482,7 @@ ExprSwitchStmt ::= SWITCH SimpleStmt SEMI_COLON Expression OPEN_CURLY Expr_case_
 				{:
 				
 				:};
-Expr_case_clause_zero_more ::= {: :} | ExprCaseClause Expr_case_clause_zero_more {: :};
+Expr_case_clause_zero_more ::= ExprCaseClause Expr_case_clause_zero_more {: :} | ;
 ExprCaseClause ::= ExprSwitchCase COLON StatementList
 				{:
 				
@@ -597,7 +577,7 @@ ElementList ::= KeyedElement keyed_element_zero_more
 				{:
 				
 				:};
-keyed_element_zero_more ::= {: :} |COMMA KeyedElement keyed_element_zero_more {: :};
+keyed_element_zero_more ::= COMMA KeyedElement keyed_element_zero_more {: :} | ;
 KeyedElement ::= Key COLON Element
 				{:
 				
@@ -680,7 +660,7 @@ SliceType ::= 	OPEN_SQUARE CLOSE_SQUARE ElementType
 				{: 
 				    	 
 				:};
-Field_decl_zero_more ::= {: :} | FieldDecl SEMI_COLON Field_decl_zero_more {: :};
+Field_decl_zero_more ::= FieldDecl SEMI_COLON Field_decl_zero_more {: :} | ;
 StructType ::= 	STRUCT OPEN_CURLY Field_decl_zero_more  CLOSE_CURLY
 				{: 
 				    	 
@@ -701,7 +681,7 @@ FieldDecl ::= 	IdentifierList Type Tag
 				{:
 				
 				:};
-Identifier_zero_more ::= {: :} | COMMA IDENTIFIER Identifier_zero_more {: :};
+Identifier_zero_more ::= COMMA IDENTIFIER Identifier_zero_more {: :} | ;
 IdentifierList ::= 	IDENTIFIER Identifier_zero_more
 				{: 
 				    	 
@@ -728,7 +708,8 @@ Signature ::= Parameters Result
 				:}
 				|Parameters
 				{: 
-				    	 
+				   
+				    System.out.println("Signature");
 				:};
 Result ::= 	Parameters
 				{: 
@@ -746,7 +727,7 @@ Parameters ::= OPEN_PARAN ParameterList CLOSE_PARAN
 				{: 
 				    	 
 				:};
-Parameter_decl_zero_more ::= {: :} | COMMA ParameterDecl Parameter_decl_zero_more{: :};
+Parameter_decl_zero_more ::= COMMA ParameterDecl Parameter_decl_zero_more{: :} | ;
 ParameterList ::= ParameterDecl Parameter_decl_zero_more
 				{: 
 				    	 
@@ -787,12 +768,13 @@ ImportSpec ::= 	DOT ImportPath
 				{: 
 				    	 
 				:};
-import_spec_zero_more ::= {: :} | ImportSpec SEMI_COLON import_spec_zero_more
+import_spec_zero_more ::= ImportSpec SEMI_COLON import_spec_zero_more
 						{:
 						:}
 						| ImportSpec import_spec_zero_more
 						{:
-						:};
+						:}
+						| ;
 ImportDecl ::= 	IMPORT ImportSpec
 				{: 
 				    	 
@@ -801,13 +783,14 @@ ImportDecl ::= 	IMPORT ImportSpec
 				{: 
 				    	 
 				:};
-import_decl_zero_more ::= {: :} | ImportDecl SEMI_COLON import_decl_zero_more
+import_decl_zero_more ::= ImportDecl SEMI_COLON import_decl_zero_more
 						{:
 						:}
 						| ImportDecl import_decl_zero_more
 						{:
-						:};
-top_level_zero_more ::= {: :} | TopLevelDecl top_level_zero_more {: :};
+						:}
+						| ;
+top_level_zero_more ::= TopLevelDecl top_level_zero_more {: :} | ;
 BreakStmt ::= 	BREAK 
 				{: 
 				    	 
@@ -818,9 +801,9 @@ ReturnStmt ::= 	RETURN ExpressionList
 				:}
 				|RETURN 
 				{: 
-				    	 
+				   System.out.println("ret"); 	 
 				:};
-expression_zero_more ::= {: :} | COMMA Expression expression_zero_more {: :};
+expression_zero_more ::= COMMA Expression expression_zero_more {: :} | ;
 ExpressionList ::= 	Expression expression_zero_more 
 				{: 
 				    	 

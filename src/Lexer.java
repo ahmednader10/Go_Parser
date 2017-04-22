@@ -471,7 +471,7 @@ return (new Symbol(sym.EOF,"Done"));
 						break;
 					case 5:
 						{
-  return (new Symbol(sym.ERROR, "Invalid input: " + yytext()+" in line "+lineCount));
+  return (new Symbol(sym.error, "Invalid input: " + yytext()+" in line "+lineCount));
 }
 					case -6:
 						break;
@@ -520,7 +520,7 @@ return (new Symbol(sym.EOF,"Done"));
 					case -16:
 						break;
 					case 16:
-						{return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));}
+						{return (new Symbol(sym.error,") has no matching ( in line "+lineCount));}
 					case -17:
 						break;
 					case 17:
@@ -532,7 +532,7 @@ return (new Symbol(sym.EOF,"Done"));
 					case -18:
 						break;
 					case 18:
-						{return (new Symbol(sym.ERROR,"} has no matching { in line "+lineCount));}
+						{return (new Symbol(sym.error,"} has no matching { in line "+lineCount));}
 					case -19:
 						break;
 					case 19:
@@ -544,7 +544,7 @@ return (new Symbol(sym.EOF,"Done"));
 					case -20:
 						break;
 					case 20:
-						{return (new Symbol(sym.ERROR,"] has no matching [ in line "+lineCount));}
+						{return (new Symbol(sym.error,"] has no matching [ in line "+lineCount));}
 					case -21:
 						break;
 					case 21:
@@ -690,20 +690,20 @@ return (new Symbol(sym.EOF,"Done"));
 					String top = (String)stack.peek();
 					if (top.equals("(")) {
 						stack.push(topValue);
-						return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+						return (new Symbol(sym.error,"You have a missing bracket in line "+lineCount));
 					}
 					else {
 						stack.push(topValue);
-						return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+						return (new Symbol(sym.error,") has no matching ( in line "+lineCount));
 					}
 				}
 				else {
-					return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+					return (new Symbol(sym.error,") has no matching ( in line "+lineCount));
 				}
 			}
 		}
 		else {
-			return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+			return (new Symbol(sym.error,") has no matching ( in line "+lineCount));
 		}
 }
 					case -54:
@@ -716,27 +716,27 @@ return (new Symbol(sym.EOF,"Done"));
 				if (!stack.isEmpty() && ((String)stack.peek()).equals("$")) {
 					yybegin(YYINITIAL);
 				}
-				return (new Symbol(sym.CLOSE_PARAN,yytext()));
+				return (new Symbol(sym.CLOSE_CURLY,yytext()));
 			}
 			else {
 				if (!stack.isEmpty()) {
 					String top = (String)stack.peek();
 					if (top.equals("{")) {
 						stack.push(topValue);
-						return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+						return (new Symbol(sym.error,"You have a missing bracket in line "+lineCount));
 					}
 					else {
 						stack.push(topValue);
-						return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+						return (new Symbol(sym.error,") has no matching ( in line "+lineCount));
 					}
 				}
 				else {
-					return (new Symbol(sym.ERROR,") has no matching ( in line "+lineCount));
+					return (new Symbol(sym.error,") has no matching ( in line "+lineCount));
 				}
 			}
 		}
 		else {
-			return (new Symbol(sym.ERROR,"} has no matching { in line "+lineCount));
+			return (new Symbol(sym.error,"} has no matching { in line "+lineCount));
 		}
 }
 					case -55:
@@ -749,34 +749,34 @@ return (new Symbol(sym.EOF,"Done"));
 				if (!stack.isEmpty() && ((String)stack.peek()).equals("$")) {
 					yybegin(YYINITIAL);
 				}
-				return (new Symbol(sym.CLOSE_PARAN,yytext()));
+				return (new Symbol(sym.CLOSE_SQUARE,yytext()));
 			}
 			else {
 				if (!stack.isEmpty()) {
 					String top = (String)stack.peek();
 					if (top.equals("[")) {
 						stack.push(topValue);
-						return (new Symbol(sym.ERROR,"You have a missing bracket in line "+lineCount));
+						return (new Symbol(sym.error,"You have a missing bracket in line "+lineCount));
 					}
 					else {
 						stack.push(topValue);
-						return (new Symbol(sym.ERROR,"] has no matching [ in line "+lineCount));
+						return (new Symbol(sym.error,"] has no matching [ in line "+lineCount));
 					}
 				}
 				else {
-					return (new Symbol(sym.ERROR,"] has no matching [ in line "+lineCount));
+					return (new Symbol(sym.error,"] has no matching [ in line "+lineCount));
 				}
 			}
 		}
 		else {
-			return (new Symbol(sym.ERROR,"} has no matching { in line "+lineCount));
+			return (new Symbol(sym.error,"} has no matching { in line "+lineCount));
 		}
 }
 					case -56:
 						break;
 					case 57:
 						{
-  return (new Symbol(sym.ERROR, "Invalid input: " + yytext()+" in line "+lineCount));
+  return (new Symbol(sym.error, "Invalid input: " + yytext()+" in line "+lineCount));
 }
 					case -57:
 						break;
@@ -798,7 +798,7 @@ return (new Symbol(sym.EOF,"Done"));
 						break;
 					case 63:
 						{
-  return (new Symbol(sym.ERROR, "Invalid input: " + yytext()+" in line "+lineCount));
+  return (new Symbol(sym.error, "Invalid input: " + yytext()+" in line "+lineCount));
 }
 					case -62:
 						break;

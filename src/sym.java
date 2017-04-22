@@ -6,14 +6,14 @@
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int REL_OP = 49;
-  public static final int INCREMENT = 44;
+  public static final int REL_OP = 48;
+  public static final int INCREMENT = 43;
   public static final int CONST = 10;
   public static final int SLASH = 38;
   public static final int CDOTS = 33;
   public static final int CASE = 5;
   public static final int CLOSE_SQUARE = 26;
-  public static final int DECREMENT = 45;
+  public static final int DECREMENT = 44;
   public static final int FOR = 13;
   public static final int MINUS = 20;
   public static final int BAR = 37;
@@ -26,7 +26,7 @@ public class sym {
   public static final int OR_OP = 17;
   public static final int OPEN_CURLY = 23;
   public static final int PLUS = 19;
-  public static final int AMBERSAND = 42;
+  public static final int AMBERSAND = 41;
   public static final int EXCLAMATION = 39;
   public static final int IF = 11;
   public static final int DOT = 29;
@@ -35,10 +35,9 @@ public class sym {
   public static final int RETURN = 15;
   public static final int EQUAL = 32;
   public static final int error = 1;
-  public static final int PERCENT = 43;
+  public static final int PERCENT = 42;
   public static final int SEMI_COLON = 27;
   public static final int BREAK = 2;
-  public static final int ERROR = 41;
   public static final int SHIFT_LEFT = 35;
   public static final int SWITCH = 9;
   public static final int CLOSE_PARAN = 22;
@@ -50,12 +49,12 @@ public class sym {
   public static final int PACKAGE = 8;
   public static final int DEFAULT = 3;
   public static final int STRUCT = 6;
-  public static final int STRING_LIT = 47;
-  public static final int INT_LIT = 48;
+  public static final int STRING_LIT = 46;
+  public static final int INT_LIT = 47;
   public static final int SHIFT_RIGHT = 36;
   public static final int VAR = 16;
   public static final int COLON_EQUAL = 31;
-  public static final int IDENTIFIER = 46;
+  public static final int IDENTIFIER = 45;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -98,7 +97,6 @@ public class sym {
   "SLASH",
   "EXCLAMATION",
   "LESS_DASH",
-  "ERROR",
   "AMBERSAND",
   "PERCENT",
   "INCREMENT",
