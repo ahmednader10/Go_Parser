@@ -10,7 +10,7 @@ public class AP {
 
 	public static void main(String[] args) {
 
-		String inFile = "MS2/Go10.in";
+		String inFile = "MS3/Go1.in";
 		String outFile = "Gotest.out";
 
 		if (args.length > 1) {
@@ -40,9 +40,9 @@ public class AP {
 			parser parser = new parser(new Lexer(bis));
 
 			try {
-				parser.parse();
-				System.out.println("Done");
-				writer.write("Done");
+				Symbol t = parser.parse();
+				System.out.println("Done ");
+				writer.write(t.value.toString());
 			} catch (Exception e) {
 				e.printStackTrace();
 				writer.write("ParseError");

@@ -19,30 +19,30 @@ terminal			BREAK, DEFAULT, FUNC,
 					CDOTS, ASTRISK, SHIFT_LEFT, SHIFT_RIGHT,
 					BAR, SLASH, EXCLAMATION, LESS_DASH,
 					AMBERSAND, PERCENT, INCREMENT, DECREMENT;
-terminal	String	IDENTIFIER, STRING_LIT, INT_LIT,REL_OP;				
+terminal	String	IDENTIFIER, STRING_LIT, INT_LIT,REL_OP;			
+	
 
 /* Non-terminals */
-nonterminal	String	binary_op, add_op, mul_op, unary_op, ArrayType, ArrayLength, Expression, UnaryExpr,
-					PrimaryExpr, Operand, Literal, BasicLit, FunctionLit, Selector, Index,
-					Function, FunctionBody,Block, StatementList, Statement_zero_more, Arguments,
-					Slice, Statement, Declaration, TopLevelDecl, FunctionDecl, FunctionName, MethodDecl,
+nonterminal	String	Expression, UnaryExpr,
+					PrimaryExpr, Operand, Literal, BasicLit, FunctionLit, Selector,
+					Function, FunctionBody,Block, StatementList, Arguments,
+					Statement, Declaration, TopLevelDecl, FunctionDecl, FunctionName, MethodDecl,
 					ConstDecl, const_spec_zero_more,
-					ConstSpec, TypeDecl, type_spec_zero_more, TypeSpec, VarDecl, VarSpec,
+					ConstSpec, VarDecl, VarSpec,
 					var_spec_zero_more, SimpleStmt,
-					ExpressionStmt, IncDecStmt, Assignment, assign_op, ShortVarDecl, IfStmt,
+					ExpressionStmt, IncDecStmt, Assignment, ShortVarDecl, IfStmt,
 					SwitchStmt, ExprSwitchStmt, ExprCaseClause,
 					Expr_case_clause_zero_more, ExprSwitchCase, ForStmt, Condition,
-					ForClause, InitStmt, PostStmt, CompositeLit, LiteralType, LiteralValue,
-					ElementList, KeyedElement, Key, FieldName, Element, keyed_element_zero_more,
+					ForClause, InitStmt, PostStmt,
 					OperandName, QualifiedIdent, 
-					MethodExpr, Receiver, ReceiverType, ElementType, TypeName, Type, TypeLit,
-					SliceType, StructType, Field_decl_zero_more, FieldDecl, AnonymousField, IdentifierList,
-					Identifier_zero_more, Tag, FunctionType, Signature, Result, Parameter_decl_zero_more,
+					Receiver, TypeName, Type, TypeLit,
+					IdentifierList,
+					Identifier_zero_more, FunctionType, Signature, Result, Parameter_decl_zero_more,
 					Parameters, ParameterList, 
 					ParameterDecl, MethodName, PackageName,
 					PackageClause, ImportPath, ImportSpec, import_spec_zero_more,
-					 top_level_zero_more, import_decl_zero_more,
-					 ImportDecl, BreakStmt, SourceFile,
+					top_level_zero_more, import_decl_zero_more,
+					ImportDecl, BreakStmt, SourceFile,
 					ReturnStmt, expression_zero_more, ExpressionList, OpSC;
 
 /* REL_OP,
@@ -53,7 +53,7 @@ nonterminal	String	binary_op, add_op, mul_op, unary_op, ArrayType, ArrayLength, 
 
 precedence left COMMA, SEMI_COLON;
 precedence left OPEN_PARAN;
-precedence left REL_OP, AND_OP, OR_OP;
+precedence left REL_OP, AND_OP, OR_OP, EXCLAMATION;
 precedence left PLUS, MINUS, BAR;
 precedence left ASTRISK, PERCENT, SLASH, SHIFT_LEFT, SHIFT_RIGHT, AMBERSAND;
 
@@ -61,385 +61,339 @@ precedence left ASTRISK, PERCENT, SLASH, SHIFT_LEFT, SHIFT_RIGHT, AMBERSAND;
 start with SourceFile;
 
 /* The grammar */
-SourceFile ::= PackageClause SEMI_COLON import_decl_zero_more  top_level_zero_more
+SourceFile ::= PackageClause SEMI_COLON import_decl_zero_more  top_level_zero_more:tl
 				{:
-					System.out.println("semi colon");
+					System.out.println("source file");
+					RESULT = tl;
 				:}
-				|PackageClause import_decl_zero_more  top_level_zero_more 
+				|PackageClause import_decl_zero_more  top_level_zero_more:tl
 				{:
-					System.out.println("without semi colon");
+					System.out.println("source file without");	
+					RESULT = tl;
 				:};
-binary_op ::= 	OR_OP
-				{: 
-				     
-				:}
-				| AND_OP
-				{: 
-						 
-				:}
-				| REL_OP
-				{: 
-						 
-				:}
-				| add_op
-				{: 
-						 
-				:}
-				| mul_op
-				{: 
-						 
-				:};
-add_op ::= 		PLUS
-				{: 
-				    	 
-				:}
-				| MINUS
-				{: 
-						 
-				:}
-				| BAR
-				{: 
-						 
-				:};
-mul_op ::= 		ASTRISK
-				{: 
-				    	 
-				:}
-				| SLASH
-				{: 
-						 
-				:}
-				| PERCENT
-				{: 
-						 
-				:}
-				| SHIFT_LEFT
-				{: 
-						 
-				:}
-				| SHIFT_RIGHT
-				{: 
-						 
-				:}
-				| AMBERSAND
-				{: 
-						 
-				:};
-unary_op ::= 	PLUS
-				{: 
-				    	 
-				:}
-				| MINUS
-				{: 
-						 
-				:}
-				| EXCLAMATION
-				{: 
-						 
-				:}
-				| ASTRISK
-				{: 
-						 
-				:}
-				| AMBERSAND
-				{: 
-						 
-				:}
-				| LESS_DASH
-				{: 
-						 
-				:};
-ArrayType ::= 	OPEN_SQUARE ArrayLength CLOSE_SQUARE ElementType 
-				{: 
-				    	 
-				:};
-ArrayLength ::= Expression 
-				{: 
-				    	 
-				:};
-Expression ::= UnaryExpr
+Expression ::= UnaryExpr:u
 				{:
-				
+					System.out.println("unary expr from expression "+u);
+					RESULT = u;
 				:}
-				| Expression binary_op Expression
+				| Expression:e REL_OP:r Expression:e1
 				{:
+					RESULT= e+r+e1;
+				:}| Expression:e OR_OP:o Expression:e1
+				{:
+					RESULT = e+o+e1;
+				:}| Expression:e AND_OP:a Expression:e1
+				{:
+					RESULT = e+a+e1;
+				:}| Expression:e PLUS:p Expression:e1
+				{:
+					RESULT = e+p+e1;
+				:}| Expression:e MINUS:m Expression:e1
+				{:
+					RESULT = e+m+e1;
+				:}| Expression:e ASTRISK:a Expression:e1
+				{:
+					RESULT = e+a+e1;
+				:}| Expression:e SLASH:s Expression:e1
+				{:
+					RESULT = e+s+e1;
+				:}| Expression:e PERCENT:p Expression:e1
+				{:
+					RESULT = e+p+e1;
+				:}| Expression:e SHIFT_LEFT:s Expression:e1
+				{:
+					RESULT = e+s+e1;
+				:}| Expression:e SHIFT_RIGHT:s Expression:e1
+				{:
+					RESULT = e+s+e1;
+				:}| Expression:e AMBERSAND:a Expression:e1
+				{:
+					RESULT = e+a+e1;
+				:}| Expression:e EXCLAMATION:ex Expression:e1
+				{:
+					RESULT = e+ex+e1;
 				:};
-UnaryExpr ::= 	PrimaryExpr
+UnaryExpr ::= 	PrimaryExpr:p
 				{:
-				
+					System.out.println("primary expr from unary expression "+p);
+					RESULT = p;
 				:}
-				| unary_op UnaryExpr
+				| MINUS:m UnaryExpr:u
 				{:
+					RESULT = m+u;
+				:}| EXCLAMATION:e UnaryExpr:u
+				{:
+					RESULT = e+u;
+				:}| ASTRISK:a UnaryExpr:u
+				{:
+					RESULT= a+u;
 				:};
-Operand ::= 	Literal
+Operand ::= 	Literal:l
 				{:
-					System.out.println("literal from operand");
+					RESULT=l;
+					System.out.println("literal from operand: "+l);
 				:}
-				| OperandName
+				| OperandName:o
 				{:
-				:}
-				| MethodExpr
-				{:
+					System.out.println("operand name from operand: "+o);
+					RESULT =o;
 				:}
 				| OPEN_PARAN Expression CLOSE_PARAN
 				{:
 				:};
-Literal ::= 	BasicLit
+Literal ::= 	BasicLit:b
 				{:
-				
+					RESULT = b;
 				:}
-				| CompositeLit
+				| FunctionLit:f
 				{:
-				:}
-				| FunctionLit
-				{:
+					RESULT=f;
 					System.out.println("function literal from literal");
 				:};
-BasicLit ::= 	INT_LIT
+BasicLit ::= 	INT_LIT:i
 				{:
-				
+					RESULT = i;
 				:}
-				| STRING_LIT
+				| STRING_LIT:s
 				{:
+					RESULT=s;
 				:};
-FunctionLit ::= FUNC Function
-				{:
+FunctionLit ::= FUNC Function:f
+				{:	
+					RESULT=f;
 					System.out.println("function literal");
 				:};
-PrimaryExpr ::=  Operand
+PrimaryExpr ::=  Operand:o
 				{:
-				
+					System.out.println("operand from primary expression "+o);
+					RESULT = o;
 				:}
-				| PrimaryExpr Selector
+				| PrimaryExpr:p Selector:s
 				{:
+					System.out.println("selector from primaryExpr");
+					RESULT=p+s;
 				:}
-				| PrimaryExpr Index
+				| PrimaryExpr:p Arguments:a
 				{:
-				:}
-				| PrimaryExpr Slice
-				{:
-				:}
-				| PrimaryExpr Arguments
-				{:
+					System.out.println("arguments from primaryExpr");
+					RESULT=p+a;
 				:};
-Selector ::=  DOT IDENTIFIER
+Selector ::=  DOT:d IDENTIFIER:i
 				{:
-				
+					RESULT =d+i;
 				:};
-Index ::=  OPEN_SQUARE Expression CLOSE_SQUARE
+Arguments ::=  	OPEN_PARAN ExpressionList:e CLOSE_PARAN
 				{:
-				
-				:};
-Slice ::=  		OPEN_SQUARE Expression COLON Expression CLOSE_SQUARE
-				{:
-				
-				:}
-				| OPEN_SQUARE COLON Expression CLOSE_SQUARE
-				{:
-				:}
-				| OPEN_SQUARE Expression COLON CLOSE_SQUARE
-				{:
-				:}
-				| OPEN_SQUARE Expression COLON Expression COLON Expression CLOSE_SQUARE
-				{:
-				:}
-				| OPEN_SQUARE COLON Expression COLON Expression CLOSE_SQUARE
-				{:
-				:};
-Arguments ::=  	OPEN_PARAN TYPE Type COMMA ExpressionList CLOSE_PARAN
-				{:
-				
-				:}
-				| OPEN_PARAN ExpressionList CLOSE_PARAN
-				{:
+					RESULT=e;
 				:}
 				| OPEN_PARAN CLOSE_PARAN
 				{:
+					RESULT="";
 				:};					
-Function ::= 	Signature FunctionBody
+Function ::= 	Signature:s FunctionBody:b
 				{:
+					RESULT=s+b+"\n"+"end_func";
 					System.out.println("function");
 				:};
-FunctionBody ::= Block
+FunctionBody ::= Block:b
 				{:
+					RESULT=b;
 					System.out.println("function body");
 				:};
-Block ::= 		OPEN_CURLY StatementList CLOSE_CURLY
+Block ::= 		OPEN_CURLY StatementList:s CLOSE_CURLY
 				{:
-				System.out.println("BLOCK");
+					RESULT=s;
+					System.out.println("BLOCK");
 				:};
-StatementList ::= Statement StatementList
+StatementList ::= Statement:s StatementList:sl
 				{:
-					System.out.println("statement list");
-				:}| {: System.out.println("Statement empty"); :} ;
-Statement_zero_more ::= Statement Statement_zero_more {: :} | {: System.out.println("Statement empty"); :} ;
-Statement ::= 	Declaration
+					RESULT="\n"+s+sl;
+				:}| {: :} ;
+Statement ::= 	Declaration:d
 				{:
-					System.out.println("DECL statement");
+					RESULT = d;
 				:}
-				| SimpleStmt SEMI_COLON
+				| SimpleStmt:s SEMI_COLON
 				{:
+					RESULT=s;
 				:}
-				| ReturnStmt SEMI_COLON
+				| ReturnStmt:r SEMI_COLON
 				{:
-					System.out.println("RETURN statement");
+					RESULT=r;
 				:}
-				| BreakStmt SEMI_COLON
+				| BreakStmt:b SEMI_COLON
 				{:
+					RESULT=b;
 				:}
-				| Block
+				| Block:b OpSC
 				{:
+					RESULT=b;
 				:}
-				| IfStmt
+				| IfStmt:i OpSC
 				{:
+					RESULT=i;
 				:}
-				| SwitchStmt
+				| SwitchStmt:s OpSC
 				{:
+					RESULT=s;
 				:}
-				| ForStmt
+				| ForStmt:f OpSC
 				{:
+					RESULT=f;
 				:};
 OpSC	::=	| SEMI_COLON;				
-Declaration ::= ConstDecl SEMI_COLON
+Declaration ::= ConstDecl:c SEMI_COLON
 				{:
+					RESULT = c;
 					System.out.println("ConstDecl");
 				:}
-				| TypeDecl OpSC
+				| VarDecl:v SEMI_COLON
 				{:
-				:}
-				| VarDecl SEMI_COLON
-				{:
+					RESULT=v;
 					System.out.println("VarDecl");	
 				:};
-TopLevelDecl ::= Declaration
+TopLevelDecl ::= Declaration:d
 				{:
+					RESULT = d;
 					System.out.println("declaration from top level decl");
 				:}
-				| FunctionDecl OpSC
+				| FunctionDecl:f OpSC
 				{:
+					RESULT=f;
 					System.out.println("function declaration from top level decl with semi colon");
 				:}
-				| MethodDecl OpSC
+				| MethodDecl:m OpSC
 				{:
+					RESULT=m;
 				:};
-MethodDecl ::= FUNC Receiver MethodName Function 
+MethodDecl ::= FUNC Receiver:r MethodName:m Function:f
 				{:
+					RESULT=r+m+f;
 					System.out.println("method decl");
 				:}
-				| FUNC Receiver MethodName Signature 
+				| FUNC Receiver:r MethodName:m Signature:s
 				{:
+					RESULT=r+m+s;
 					System.out.println("method decl");
 				:};
-Receiver ::= Parameters 
+Receiver ::= Parameters:p
 			{: 
+				RESULT=p;
 			:};
-FunctionDecl ::= FUNC FunctionName Function
+FunctionDecl ::= FUNC FunctionName:f Function:fu
 				{:
+					RESULT=f+":"+"\n"+"begin_func;"+fu;
 					System.out.println("function decl 2");
 				:}
-				| FUNC FunctionName Signature
+				| FUNC FunctionName:f Signature:s
 				{:
+					RESULT=f+":"+"\n"+"begin_func;"+s;
 					System.out.println("function decl 1");
 				:};
 FunctionName ::= IDENTIFIER:i
 				{:
+					RESULT= "\n"+i;
 					System.out.println("function name "+i);
 				:};
-ConstDecl ::= 	CONST ConstSpec
+ConstDecl ::= 	CONST ConstSpec:c
 				{:
-				
+					System.out.println("constspec "+c);
+					RESULT = c;
 				:}
-				| CONST OPEN_PARAN const_spec_zero_more CLOSE_PARAN
+				| CONST OPEN_PARAN const_spec_zero_more:c CLOSE_PARAN
 				{:
-				
+					RESULT = c;
 				:};
-const_spec_zero_more ::= ConstSpec SEMI_COLON const_spec_zero_more {: :} | ;
-ConstSpec ::= 	IDENTIFIER Type EQUAL Expression
+const_spec_zero_more ::= ConstSpec:c SEMI_COLON const_spec_zero_more:cz {: RESULT = c+cz; :} | ;
+ConstSpec ::= 	IDENTIFIER:i Type EQUAL Expression:e
 				{:
-				
+					System.out.println(i +" = "+ e);
+					RESULT = i +" = "+ e;
 				:}
-				|IDENTIFIER EQUAL Expression
+				|IDENTIFIER:i EQUAL Expression:e
 				{:
-				
+					System.out.println(i +" = "+ e);
+					RESULT = i +" = "+ e;
 				:}
-				|IDENTIFIER
+				|IDENTIFIER:i
 				{:
-				
+					System.out.println(i);
+					RESULT = i;
 				:};
-TypeDecl ::= 	TYPE TypeSpec
+VarDecl ::= 	VAR VarSpec:v
 				{:
-				
+					RESULT = v;
 				:}
-				| TYPE OPEN_PARAN type_spec_zero_more CLOSE_PARAN
+				| VAR OPEN_PARAN var_spec_zero_more:v CLOSE_PARAN
 				{:
-				
+					RESULT = v;
 				:};
-type_spec_zero_more ::= TypeSpec SEMI_COLON type_spec_zero_more {: :} | ;
-TypeSpec ::= 	IDENTIFIER Type
+var_spec_zero_more ::= VarSpec:v SEMI_COLON var_spec_zero_more:vz {: RESULT = v+vz; :} | ;
+VarSpec ::= 	IDENTIFIER:i Type EQUAL Expression:e
 				{:
-				
+					RESULT = i+"="+e;
+				:}
+				| IDENTIFIER:i Type:t
+				{:
+					RESULT = i;
+				:}
+				| IDENTIFIER:i EQUAL Expression:e
+				{:
+					RESULT = i+"="+e;
 				:};
-VarDecl ::= 	VAR VarSpec
+SimpleStmt ::= 	ExpressionStmt:e
 				{:
-				
+					RESULT = e;
 				:}
-				| VAR OPEN_PARAN var_spec_zero_more CLOSE_PARAN
+				| IncDecStmt:i
 				{:
-				
+					RESULT = i;
+				:}
+				| Assignment:a
+				{:
+					RESULT = a;
+				:}
+				| ShortVarDecl:s
+				{:
+					RESULT = s;
 				:};
-var_spec_zero_more ::= VarSpec SEMI_COLON var_spec_zero_more {: :} | ;
-VarSpec ::= 	IDENTIFIER Type EQUAL Expression
+ExpressionStmt ::= Expression:e
 				{:
-				
-				:}
-				| IDENTIFIER Type
-				{:
-				
-				:}
-				| IDENTIFIER EQUAL Expression
-				{:
-				
+					RESULT = e;
 				:};
-SimpleStmt ::= 	ExpressionStmt
+IncDecStmt ::= Expression:e INCREMENT:i
 				{:
-				
+					RESULT = e+i;
 				:}
-				| IncDecStmt
+				| Expression:e DECREMENT:d
 				{:
-				:}
-				| Assignment
-				{:
-				:}
-				| ShortVarDecl
-				{:
+					RESULT = e+d;
 				:};
-ExpressionStmt ::= Expression
+Assignment ::= ExpressionList:e PLUS:p EQUAL:eq ExpressionList:el
 				{:
-				
+					RESULT = e+p+eq+el;
+				:}|ExpressionList:e MINUS:m EQUAL:eq ExpressionList:el
+				{:
+					RESULT = e+m+eq+el;
+				:}|ExpressionList:e ASTRISK:a EQUAL:eq ExpressionList:el
+				{:
+					RESULT = e+a+eq+el;
+				:}|ExpressionList:e SLASH:s EQUAL:eq ExpressionList:el
+				{:
+					RESULT = e+s+eq+el;
+				:}|ExpressionList:e SHIFT_RIGHT:s EQUAL:eq ExpressionList:el
+				{:
+					RESULT = e+s+eq+el;
+				:}|ExpressionList:e SHIFT_LEFT:s EQUAL:eq ExpressionList:el
+				{:
+					RESULT = e+s+eq+el;
+				:}|ExpressionList:e EQUAL:eq ExpressionList:el
+				{:
+					RESULT = e+eq+el;
 				:};
-IncDecStmt ::= Expression INCREMENT
+ShortVarDecl ::= IdentifierList:i COLON_EQUAL:c Expression:e
 				{:
-				
-				:}
-				| Expression DECREMENT
-				{:
-				:};
-Assignment ::= ExpressionList assign_op ExpressionList
-				{:
-				
-				:};
-assign_op ::= 	add_op EQUAL
-				{:
-				
-				:}
-				| mul_op EQUAL
-				{:
-				
-				:}
-				| EQUAL;
-ShortVarDecl ::= IdentifierList COLON_EQUAL Expression
-				{:
-				
+					RESULT=i+"="+e;
 				:};
 IfStmt ::= 		IF SimpleStmt SEMI_COLON Expression Block ELSE IfStmt
 				{:
@@ -462,9 +416,9 @@ IfStmt ::= 		IF SimpleStmt SEMI_COLON Expression Block ELSE IfStmt
 				| IF Expression Block
 				{:
 				:};
-SwitchStmt ::= 	ExprSwitchStmt
+SwitchStmt ::= 	ExprSwitchStmt:e
 				{:
-				
+					RESULT=e;
 				:};
 ExprSwitchStmt ::= SWITCH SimpleStmt SEMI_COLON Expression OPEN_CURLY Expr_case_clause_zero_more CLOSE_CURLY
 				{:
@@ -487,18 +441,14 @@ ExprCaseClause ::= ExprSwitchCase COLON StatementList
 				{:
 				
 				:};
-ExprSwitchCase ::= CASE ExpressionList
+ExprSwitchCase ::= CASE Expression
 				{:
 				
 				:}
 				| DEFAULT
 				{:
 				:};
-ForStmt ::= 	FOR Condition Block
-				{:
-				
-				:}
-				| FOR ForClause Block
+ForStmt ::= 	FOR ForClause Block
 				{:
 				:};
 Condition ::= 	Expression
@@ -508,249 +458,102 @@ Condition ::= 	Expression
 ForClause ::= 	InitStmt SEMI_COLON Condition SEMI_COLON PostStmt
 				{:
 				
-				:}
-				| SEMI_COLON Condition SEMI_COLON PostStmt
-				{:
-				
-				:}
-				|InitStmt SEMI_COLON SEMI_COLON PostStmt
-				{:
-				
-				:}
-				| SEMI_COLON  SEMI_COLON PostStmt
-				{:
-				
-				:}
-				|InitStmt SEMI_COLON Condition SEMI_COLON
-				{:
-				
-				:}
-				| SEMI_COLON Condition SEMI_COLON
-				{:
-				
-				:}
-				|InitStmt SEMI_COLON SEMI_COLON
-				{:
-				
-				:}
-				| SEMI_COLON  SEMI_COLON
-				{:
-				
 				:};
-InitStmt ::= 	SimpleStmt
+InitStmt ::= 	SimpleStmt:s
 				{:
-				
+					RESULT=s;
 				:};
-PostStmt ::= 	SimpleStmt
+PostStmt ::= 	SimpleStmt:s
 				{:
-				
+					RESULT=s;
 				:};
-CompositeLit ::= LiteralType LiteralValue
+OperandName ::= IDENTIFIER:i
 				{:
-				
-				:};
-LiteralType ::= StructType
-				{:
-				
+					RESULT=i;
 				:}
-				| ArrayType
+				| QualifiedIdent:q
 				{:
-				:}
-				| OPEN_SQUARE CDOTS CLOSE_SQUARE ElementType
-				{:
-				:}
-				| SliceType
-				{:
-				:}
-				| TYPE TypeName
-				{:
+					RESULT=q;
 				:};
-LiteralValue ::= OPEN_CURLY ElementList CLOSE_CURLY
-				{:
-				
-				:}
-				| OPEN_CURLY CLOSE_CURLY
-				{:
-				
-				:};
-ElementList ::= KeyedElement keyed_element_zero_more
-				{:
-				
-				:};
-keyed_element_zero_more ::= COMMA KeyedElement keyed_element_zero_more {: :} | ;
-KeyedElement ::= Key COLON Element
-				{:
-				
-				:}
-				| Element
-				{:
-				:};
-Key ::= 		FieldName
-				{:
-				
-				:}
-				| LiteralValue
-				{:
-				:};
-FieldName ::= 	IDENTIFIER
-				{:
-				
-				:};
-Element ::= 	Expression
-				{:
-				
-				:}
-				| LiteralValue
-				{:
-				:};
-OperandName ::= IDENTIFIER
-				{:
-				
-				:}
-				| QualifiedIdent
-				{:
-				:};
-QualifiedIdent ::= DOT PackageName DOT IDENTIFIER 
+QualifiedIdent ::= DOT:d PackageName:p DOT:d0 IDENTIFIER:i
 				{: 
-				    	 
+				    RESULT=d+p+d0+i;
 				:};
-MethodExpr     ::= DOT ReceiverType DOT MethodName 
+TypeName ::= 	IDENTIFIER:i
 				{: 
-				    	 
+				    RESULT=i;	 
 				:};
-ReceiverType ::= OPEN_PARAN ASTRISK TypeName CLOSE_PARAN
+Type ::= 		TypeName:t
+				{: 
+				    RESULT=t; 
+				:}
+				| TypeLit:t
 				{:
-				
-				:}
-				| OPEN_PARAN TypeName CLOSE_PARAN
-				{:
-				:};				
-ElementType ::= Type 
-				{: 
-				    	 
+					RESULT=t;
 				:};
-TypeName ::= 	IDENTIFIER
+TypeLit ::= 	FunctionType:f
 				{: 
-				    	 
+				    RESULT=f; 
 				:};
-Type ::= 		TypeName
+Identifier_zero_more ::= COMMA:c IDENTIFIER:i Identifier_zero_more:iz {: RESULT=c+i+iz; :} | ;
+IdentifierList ::= 	IDENTIFIER:i Identifier_zero_more:iz
 				{: 
-				    	 
-				:}
-				| TypeLit
-				{:
+				    RESULT=i+iz;
 				:};
-TypeLit ::= 	ArrayType
+FunctionType ::= FUNC Signature:s
 				{: 
-				    	 
-				:}
-				| StructType
-				{:
-				
-				:}
-				| FunctionType
-				{: 
-				    	 
-				:}
-				| SliceType
-				{:
-				
-				:};
-SliceType ::= 	OPEN_SQUARE CLOSE_SQUARE ElementType
-				{: 
-				    	 
-				:};
-Field_decl_zero_more ::= FieldDecl SEMI_COLON Field_decl_zero_more {: :} | ;
-StructType ::= 	STRUCT OPEN_CURLY Field_decl_zero_more  CLOSE_CURLY
-				{: 
-				    	 
-				:};
-FieldDecl ::= 	IdentifierList Type Tag
-				{: 
-				    	 
-				:}
-				| AnonymousField Tag
-				{:
-				
-				:}
-				|IdentifierList Type
-				{: 
-				    	 
-				:}
-				| AnonymousField
-				{:
-				
-				:};
-Identifier_zero_more ::= COMMA IDENTIFIER Identifier_zero_more {: :} | ;
-IdentifierList ::= 	IDENTIFIER Identifier_zero_more
-				{: 
-				    	 
-				:};
-AnonymousField ::= 	ASTRISK TypeName
-				{: 
-				    	 
-				:}
-				|TypeName
-				{: 
-				    	 
-				:};
-Tag ::= 		STRING_LIT
-				{: 
-				    	 
-				:};
-FunctionType ::= FUNC Signature
-				{: 
+					RESULT=s;
 				    System.out.println("function type");
 				:};
-Signature ::= Parameters Result
+Signature ::= Parameters:p Result:r
 				{: 
-				    	 
+				    RESULT=p+r; 
 				:}
-				|Parameters
+				|Parameters:p
 				{: 
-				   
+				   	RESULT=p;
 				    System.out.println("Signature");
 				:};
-Result ::= 	Parameters
+Result ::= 	Parameters:p
 				{: 
-				    	 
+				    RESULT=p; 
 				:}
-				| OPEN_PARAN Type CLOSE_PARAN
+				| OPEN_PARAN Type:t CLOSE_PARAN
 				{:
-				
+					RESULT=t;
 				:};
 Parameters ::= OPEN_PARAN ParameterList CLOSE_PARAN
 				{: 
-				    	 
+				    RESULT="";
 				:}
 				|OPEN_PARAN CLOSE_PARAN
 				{: 
-				    	 
+				    RESULT=""; 
 				:};
-Parameter_decl_zero_more ::= COMMA ParameterDecl Parameter_decl_zero_more{: :} | ;
+Parameter_decl_zero_more ::= COMMA ParameterDecl Parameter_decl_zero_more{: RESULT=""; :} | ;
 ParameterList ::= ParameterDecl Parameter_decl_zero_more
 				{: 
-				    	 
+				    RESULT="";
 				:};
-ParameterDecl ::= IdentifierList CDOTS Type
+ParameterDecl ::= IdentifierList:i CDOTS Type
 				{: 
-				    	 
+				    RESULT=i;
 				:}
-				|IdentifierList Type
+				|IdentifierList:i Type
 				{: 
-				    	 
+				    RESULT=i; 
 				:};
-MethodName ::= 	IDENTIFIER
+MethodName ::= 	IDENTIFIER:i
 				{: 
-				    	 
+				    RESULT=i; 
 				:};
-PackageName ::= IDENTIFIER
+PackageName ::= IDENTIFIER:i
 				{: 
-				    	 
+				    RESULT=i; 
 				:};
 PackageClause ::= PACKAGE PackageName
 				{: 
-				    	 System.out.println("package");
+				    	
 				:};
 ImportPath ::= 	STRING_LIT 
 				{: 
@@ -790,21 +593,21 @@ import_decl_zero_more ::= ImportDecl SEMI_COLON import_decl_zero_more
 						{:
 						:}
 						| ;
-top_level_zero_more ::= TopLevelDecl top_level_zero_more {: :} | ;
-BreakStmt ::= 	BREAK 
+top_level_zero_more ::= TopLevelDecl:tl top_level_zero_more:tz {: RESULT=tl+tz; :} | ;
+BreakStmt ::= 	BREAK
 				{: 
-				    	 
+				    RESULT=""; 
 				:};
-ReturnStmt ::= 	RETURN ExpressionList 
+ReturnStmt ::= 	RETURN:r ExpressionList:e
 				{: 
-				    	 
+				    RESULT=r+e;	 
 				:}
-				|RETURN 
+				|RETURN:r
 				{: 
-				   System.out.println("ret"); 	 
+				 	 RESULT="";
 				:};
-expression_zero_more ::= COMMA Expression expression_zero_more {: :} | ;
-ExpressionList ::= 	Expression expression_zero_more 
+expression_zero_more ::= COMMA:c Expression:e expression_zero_more:ez {: RESULT=c+e+ez; :} | ;
+ExpressionList ::= 	Expression:e expression_zero_more:ez 
 				{: 
-				    	 
+				    RESULT=e+ez;
 				:};

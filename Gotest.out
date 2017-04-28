@@ -1,1 +1,12 @@
-Done
+s = "constant"
+main:
+begin_func;
+.fmt.Printlnsnull
+n = 5000
+d=3/n
+.fmt.Printlndnull
+e=d-n*2+d
+tnull=null
+m = 16
+mShifted=m>>2null
+end_funcnull
