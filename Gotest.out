@@ -1,12 +1,16 @@
 s = "constant"
 main:
 begin_func;
-.fmt.Printlnsnull
+.fmt.Println
+push_params: s
+pop_params;
 n = 5000
 d=3/n
-.fmt.Printlndnull
+.fmt.Println
+push_params: d
+pop_params;
 e=d-n*2+d
-tnull=null
+t=e!=5
 m = 16
-mShifted=m>>2null
-end_funcnull
+mShifted=m>>2
+end_func;

@@ -63,12 +63,10 @@ start with SourceFile;
 /* The grammar */
 SourceFile ::= PackageClause SEMI_COLON import_decl_zero_more  top_level_zero_more:tl
 				{:
-					System.out.println("source file");
 					RESULT = tl;
 				:}
 				|PackageClause import_decl_zero_more  top_level_zero_more:tl
 				{:
-					System.out.println("source file without");	
 					RESULT = tl;
 				:};
 Expression ::= UnaryExpr:u
@@ -102,9 +100,11 @@ Expression ::= UnaryExpr:u
 					RESULT = e+p+e1;
 				:}| Expression:e SHIFT_LEFT:s Expression:e1
 				{:
+					System.out.println(e1);
 					RESULT = e+s+e1;
 				:}| Expression:e SHIFT_RIGHT:s Expression:e1
 				{:
+					System.out.println("shift "+e1);
 					RESULT = e+s+e1;
 				:}| Expression:e AMBERSAND:a Expression:e1
 				{:
@@ -138,8 +138,9 @@ Operand ::= 	Literal:l
 					System.out.println("operand name from operand: "+o);
 					RESULT =o;
 				:}
-				| OPEN_PARAN Expression CLOSE_PARAN
+				| OPEN_PARAN Expression:e CLOSE_PARAN
 				{:
+					RESULT = e;
 				:};
 Literal ::= 	BasicLit:b
 				{:
@@ -176,7 +177,7 @@ PrimaryExpr ::=  Operand:o
 				| PrimaryExpr:p Arguments:a
 				{:
 					System.out.println("arguments from primaryExpr");
-					RESULT=p+a;
+					RESULT=p+a+"\n"+"pop_params;";
 				:};
 Selector ::=  DOT:d IDENTIFIER:i
 				{:
@@ -184,7 +185,8 @@ Selector ::=  DOT:d IDENTIFIER:i
 				:};
 Arguments ::=  	OPEN_PARAN ExpressionList:e CLOSE_PARAN
 				{:
-					RESULT=e;
+					System.out.println("arguments "+e);
+					RESULT="\n"+"push_params: "+e;
 				:}
 				| OPEN_PARAN CLOSE_PARAN
 				{:
@@ -192,13 +194,13 @@ Arguments ::=  	OPEN_PARAN ExpressionList:e CLOSE_PARAN
 				:};					
 Function ::= 	Signature:s FunctionBody:b
 				{:
-					RESULT=s+b+"\n"+"end_func";
+					RESULT=s+b+"\n"+"end_func;";
 					System.out.println("function");
 				:};
 FunctionBody ::= Block:b
 				{:
 					RESULT=b;
-					System.out.println("function body");
+					System.out.println("function body ");
 				:};
 Block ::= 		OPEN_CURLY StatementList:s CLOSE_CURLY
 				{:
@@ -208,7 +210,7 @@ Block ::= 		OPEN_CURLY StatementList:s CLOSE_CURLY
 StatementList ::= Statement:s StatementList:sl
 				{:
 					RESULT="\n"+s+sl;
-				:}| {: :} ;
+				:}| {: RESULT=""; :} ;
 Statement ::= 	Declaration:d
 				{:
 					RESULT = d;
@@ -250,17 +252,17 @@ Declaration ::= ConstDecl:c SEMI_COLON
 				| VarDecl:v SEMI_COLON
 				{:
 					RESULT=v;
-					System.out.println("VarDecl");	
+					System.out.println("VarDecl "+v);	
 				:};
 TopLevelDecl ::= Declaration:d
 				{:
 					RESULT = d;
-					System.out.println("declaration from top level decl");
+					System.out.println("declaration from top level decl "+d);
 				:}
 				| FunctionDecl:f OpSC
 				{:
 					RESULT=f;
-					System.out.println("function declaration from top level decl with semi colon");
+					System.out.println("function declaration from top level decl with semi colon "+f);
 				:}
 				| MethodDecl:m OpSC
 				{:
@@ -304,7 +306,7 @@ ConstDecl ::= 	CONST ConstSpec:c
 				{:
 					RESULT = c;
 				:};
-const_spec_zero_more ::= ConstSpec:c SEMI_COLON const_spec_zero_more:cz {: RESULT = c+cz; :} | ;
+const_spec_zero_more ::= ConstSpec:c SEMI_COLON const_spec_zero_more:cz {: RESULT = c+cz; :} | {: RESULT=""; :};
 ConstSpec ::= 	IDENTIFIER:i Type EQUAL Expression:e
 				{:
 					System.out.println(i +" = "+ e);
@@ -328,7 +330,7 @@ VarDecl ::= 	VAR VarSpec:v
 				{:
 					RESULT = v;
 				:};
-var_spec_zero_more ::= VarSpec:v SEMI_COLON var_spec_zero_more:vz {: RESULT = v+vz; :} | ;
+var_spec_zero_more ::= VarSpec:v SEMI_COLON var_spec_zero_more:vz {: RESULT = v+vz; :} | {: RESULT=""; :};
 VarSpec ::= 	IDENTIFIER:i Type EQUAL Expression:e
 				{:
 					RESULT = i+"="+e;
@@ -383,9 +385,11 @@ Assignment ::= ExpressionList:e PLUS:p EQUAL:eq ExpressionList:el
 					RESULT = e+s+eq+el;
 				:}|ExpressionList:e SHIFT_RIGHT:s EQUAL:eq ExpressionList:el
 				{:
+					System.out.println("assignment "+el);
 					RESULT = e+s+eq+el;
 				:}|ExpressionList:e SHIFT_LEFT:s EQUAL:eq ExpressionList:el
 				{:
+					System.out.println("assignment "+el);
 					RESULT = e+s+eq+el;
 				:}|ExpressionList:e EQUAL:eq ExpressionList:el
 				{:
@@ -393,6 +397,7 @@ Assignment ::= ExpressionList:e PLUS:p EQUAL:eq ExpressionList:el
 				:};
 ShortVarDecl ::= IdentifierList:i COLON_EQUAL:c Expression:e
 				{:
+					System.out.println("short var "+e);
 					RESULT=i+"="+e;
 				:};
 IfStmt ::= 		IF SimpleStmt SEMI_COLON Expression Block ELSE IfStmt
@@ -436,7 +441,7 @@ ExprSwitchStmt ::= SWITCH SimpleStmt SEMI_COLON Expression OPEN_CURLY Expr_case_
 				{:
 				
 				:};
-Expr_case_clause_zero_more ::= ExprCaseClause Expr_case_clause_zero_more {: :} | ;
+Expr_case_clause_zero_more ::= ExprCaseClause Expr_case_clause_zero_more {: :} | {: RESULT=""; :};
 ExprCaseClause ::= ExprSwitchCase COLON StatementList
 				{:
 				
@@ -469,7 +474,7 @@ PostStmt ::= 	SimpleStmt:s
 				:};
 OperandName ::= IDENTIFIER:i
 				{:
-					RESULT=i;
+					RESULT= i;
 				:}
 				| QualifiedIdent:q
 				{:
@@ -495,7 +500,7 @@ TypeLit ::= 	FunctionType:f
 				{: 
 				    RESULT=f; 
 				:};
-Identifier_zero_more ::= COMMA:c IDENTIFIER:i Identifier_zero_more:iz {: RESULT=c+i+iz; :} | ;
+Identifier_zero_more ::= COMMA:c IDENTIFIER:i Identifier_zero_more:iz {: RESULT=c+i+iz; :} | {: RESULT=""; :};
 IdentifierList ::= 	IDENTIFIER:i Identifier_zero_more:iz
 				{: 
 				    RESULT=i+iz;
@@ -530,7 +535,7 @@ Parameters ::= OPEN_PARAN ParameterList CLOSE_PARAN
 				{: 
 				    RESULT=""; 
 				:};
-Parameter_decl_zero_more ::= COMMA ParameterDecl Parameter_decl_zero_more{: RESULT=""; :} | ;
+Parameter_decl_zero_more ::= COMMA ParameterDecl Parameter_decl_zero_more{: RESULT=""; :} | {: RESULT=""; :};
 ParameterList ::= ParameterDecl Parameter_decl_zero_more
 				{: 
 				    RESULT="";
@@ -593,7 +598,7 @@ import_decl_zero_more ::= ImportDecl SEMI_COLON import_decl_zero_more
 						{:
 						:}
 						| ;
-top_level_zero_more ::= TopLevelDecl:tl top_level_zero_more:tz {: RESULT=tl+tz; :} | ;
+top_level_zero_more ::= TopLevelDecl:tl top_level_zero_more:tz {: System.out.println("top level zero "+tz); RESULT=tl+tz; :} | {: RESULT=""; :} ;
 BreakStmt ::= 	BREAK
 				{: 
 				    RESULT=""; 
@@ -606,8 +611,9 @@ ReturnStmt ::= 	RETURN:r ExpressionList:e
 				{: 
 				 	 RESULT="";
 				:};
-expression_zero_more ::= COMMA:c Expression:e expression_zero_more:ez {: RESULT=c+e+ez; :} | ;
+expression_zero_more ::= COMMA:c Expression:e expression_zero_more:ez {: RESULT=c+e+ez; :} | {: RESULT=""; :};
 ExpressionList ::= 	Expression:e expression_zero_more:ez 
 				{: 
+					System.out.println("expression list "+ez);
 				    RESULT=e+ez;
 				:};
