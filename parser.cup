@@ -177,7 +177,7 @@ PrimaryExpr ::=  Operand:o
 				| PrimaryExpr:p Arguments:a
 				{:
 					System.out.println("arguments from primaryExpr");
-					RESULT=p+a+"\n"+"pop_params;";
+					RESULT=p+a+"\n"+"pop_params;"+"\n";
 				:};
 Selector ::=  DOT:d IDENTIFIER:i
 				{:
@@ -400,69 +400,74 @@ ShortVarDecl ::= IdentifierList:i COLON_EQUAL:c Expression:e
 					System.out.println("short var "+e);
 					RESULT=i+"="+e;
 				:};
-IfStmt ::= 		IF SimpleStmt SEMI_COLON Expression Block ELSE IfStmt
+IfStmt ::= 		IF:i SimpleStmt:s SEMI_COLON Expression:e Block:b ELSE:el IfStmt:i2
 				{:
-				
+					RESULT = i+" "+s+e+b+el+i2;
 				:}
-				|IF SimpleStmt SEMI_COLON Expression Block ELSE Block
+				|IF:i SimpleStmt:s SEMI_COLON Expression:e Block:b ELSE:el Block:b1
 				{:
-				
+					RESULT = i+" "+s+e+b+el+b1;
 				:}
-				|IF SimpleStmt SEMI_COLON Expression Block
+				|IF:i SimpleStmt:s SEMI_COLON Expression:e Block:b
 				{:
-				
+					RESULT = i+" "+s+e+b;
 				:}
-				| IF Expression Block ELSE IfStmt
+				| IF:i Expression:e Block:b ELSE:el IfStmt:i2
 				{:
+					RESULT = i+" "+e+b+el+i2;
 				:}
-				| IF Expression Block ELSE Block
+				| IF:i Expression:e Block:b ELSE:el Block:b1
 				{:
+					RESULT = i+" "+e+b+el+b1;
 				:}
-				| IF Expression Block
+				| IF:i Expression:e Block:b
 				{:
+					RESULT = i+" "+e+b;
 				:};
 SwitchStmt ::= 	ExprSwitchStmt:e
 				{:
 					RESULT=e;
 				:};
-ExprSwitchStmt ::= SWITCH SimpleStmt SEMI_COLON Expression OPEN_CURLY Expr_case_clause_zero_more CLOSE_CURLY
+ExprSwitchStmt ::= SWITCH:s SimpleStmt:ss SEMI_COLON Expression:e OPEN_CURLY Expr_case_clause_zero_more:ez CLOSE_CURLY
 				{:
-				
+					RESULT = s+" "+ss+e+"\n"+ez;
 				:}
-				|SWITCH Expression OPEN_CURLY Expr_case_clause_zero_more CLOSE_CURLY
+				|SWITCH:s Expression:e OPEN_CURLY Expr_case_clause_zero_more:ez CLOSE_CURLY
 				{:
-				
+					RESULT = s+" "+e+"\n"+ez;
 				:}
-				| SWITCH SimpleStmt SEMI_COLON OPEN_CURLY Expr_case_clause_zero_more CLOSE_CURLY
+				| SWITCH:s SimpleStmt:ss SEMI_COLON OPEN_CURLY Expr_case_clause_zero_more:ez CLOSE_CURLY
 				{:
-				
+					RESULT = s+" "+ss+"\n"+ez;
 				:}
-				|SWITCH OPEN_CURLY Expr_case_clause_zero_more CLOSE_CURLY
+				|SWITCH:s OPEN_CURLY Expr_case_clause_zero_more:ez CLOSE_CURLY
 				{:
-				
+					RESULT = s+" "+"\n"+ez;
 				:};
-Expr_case_clause_zero_more ::= ExprCaseClause Expr_case_clause_zero_more {: :} | {: RESULT=""; :};
-ExprCaseClause ::= ExprSwitchCase COLON StatementList
+Expr_case_clause_zero_more ::= ExprCaseClause:e Expr_case_clause_zero_more:ez {: RESULT = e+ez; :} | {: RESULT=""; :};
+ExprCaseClause ::= ExprSwitchCase:e COLON StatementList:s
 				{:
-				
+					RESULT= e+s;
 				:};
-ExprSwitchCase ::= CASE Expression
+ExprSwitchCase ::= CASE:c Expression:e
 				{:
-				
+					RESULT = c+" "+e;
 				:}
-				| DEFAULT
+				| DEFAULT:d
 				{:
+					RESULT = d+" ";
 				:};
-ForStmt ::= 	FOR ForClause Block
+ForStmt ::= 	FOR:f ForClause:fc Block:b
 				{:
+					RESULT = f+" "+fc+"\n"+b;
 				:};
-Condition ::= 	Expression
+Condition ::= 	Expression:e
 				{:
-				
+					RESULT= e;
 				:};
-ForClause ::= 	InitStmt SEMI_COLON Condition SEMI_COLON PostStmt
+ForClause ::= 	InitStmt:i SEMI_COLON Condition:c SEMI_COLON PostStmt:p
 				{:
-				
+					RESULT = i+" "+c+" "+p;
 				:};
 InitStmt ::= 	SimpleStmt:s
 				{:
@@ -605,7 +610,7 @@ BreakStmt ::= 	BREAK
 				:};
 ReturnStmt ::= 	RETURN:r ExpressionList:e
 				{: 
-				    RESULT=r+e;	 
+				    RESULT=r+" "+e;	 
 				:}
 				|RETURN:r
 				{: 
@@ -617,3 +622,4 @@ ExpressionList ::= 	Expression:e expression_zero_more:ez
 					System.out.println("expression list "+ez);
 				    RESULT=e+ez;
 				:};
+

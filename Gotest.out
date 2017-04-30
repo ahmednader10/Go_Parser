@@ -1,16 +1,22 @@
-s = "constant"
+
 main:
 begin_func;
-.fmt.Println
-push_params: s
+.fmt.Print
+push_params: "Go runs on"
 pop_params;
-n = 5000
-d=3/n
+
+switch os="linux"os
+case "darwin"
 .fmt.Println
-push_params: d
+push_params: "OS X."
 pop_params;
-e=d-n*2+d
-t=e!=5
-m = 16
-mShifted=m>>2
+case "linux"
+.fmt.Println
+push_params: "Linux."
+pop_params;
+default 
+.fmt.Printf
+push_params: "Others."
+pop_params;
+
 end_func;
