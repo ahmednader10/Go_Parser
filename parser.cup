@@ -23,14 +23,13 @@ terminal	String	IDENTIFIER, STRING_LIT, INT_LIT,REL_OP;
 	
 
 /* Non-terminals */
-nonterminal	String	Expression, UnaryExpr,
-					PrimaryExpr, Operand, Literal, BasicLit, FunctionLit, Selector,
+nonterminal	String	Literal, BasicLit, FunctionLit, Selector,
 					Function, FunctionBody,Block, StatementList, Arguments,
 					Statement, Declaration, TopLevelDecl, FunctionDecl, FunctionName, MethodDecl,
 					ConstDecl, const_spec_zero_more,
 					ConstSpec, VarDecl, VarSpec,
 					var_spec_zero_more, SimpleStmt,
-					ExpressionStmt, IncDecStmt, Assignment, ShortVarDecl, IfStmt,
+					IncDecStmt, Assignment, ShortVarDecl, IfStmt,
 					SwitchStmt, ExprSwitchStmt, ExprCaseClause,
 					Expr_case_clause_zero_more, ExprSwitchCase, ForStmt, Condition,
 					ForClause, InitStmt, PostStmt,
@@ -44,18 +43,19 @@ nonterminal	String	Expression, UnaryExpr,
 					top_level_zero_more, import_decl_zero_more,
 					ImportDecl, BreakStmt, SourceFile,
 					ReturnStmt, expression_zero_more, ExpressionList, OpSC;
+nonterminal Expr    Expression, UnaryExpr, PrimaryExpr,ExpressionStmt, Operand;
 
 /* REL_OP,
 			ASTRISK, SHIFT_LEFT, SHIFT_RIGHT,
 					BAR, SLASH, EXCLAMATION, LESS_DASH, 
 					AMBERSAND, PERCENT, INCREMENT, DECREMENT		PLUS, MINUS, */
 
-
-precedence left COMMA, SEMI_COLON;
-precedence left OPEN_PARAN;
-precedence left REL_OP, AND_OP, OR_OP, EXCLAMATION;
+precedence left COMMA;
+precedence left OR_OP;
+precedence left AND_OP;
+precedence left REL_OP;
 precedence left PLUS, MINUS, BAR;
-precedence left ASTRISK, PERCENT, SLASH, SHIFT_LEFT, SHIFT_RIGHT, AMBERSAND;
+precedence left ASTRISK, PERCENT, SLASH, SHIFT_LEFT, SHIFT_RIGHT, AMBERSAND, EXCLAMATION;
 
 
 start with SourceFile;
@@ -70,73 +70,104 @@ SourceFile ::= PackageClause SEMI_COLON import_decl_zero_more  top_level_zero_mo
 					RESULT = tl;
 				:};
 Expression ::= UnaryExpr:u
-				{:
-					System.out.println("unary expr from expression "+u);
+				{:	
+					
 					RESULT = u;
 				:}
 				| Expression:e REL_OP:r Expression:e1
 				{:
-					RESULT= e+r+e1;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = e.code+e1.code+RESULT.addr+"="+e.addr+r+e1.addr;
+					System.out.println("result code "+RESULT.code);
+					System.out.println("result addr "+RESULT.addr);
 				:}| Expression:e OR_OP:o Expression:e1
 				{:
-					RESULT = e+o+e1;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = e.code+"\n"+e1.code+"\n"+RESULT.addr+"="+e.addr+o+e1.addr;
 				:}| Expression:e AND_OP:a Expression:e1
 				{:
-					RESULT = e+a+e1;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = e.code+"\n"+e1.code+"\n"+RESULT.addr+"="+e.addr+a+e1.addr;
 				:}| Expression:e PLUS:p Expression:e1
 				{:
-					RESULT = e+p+e1;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = e.code+"\n"+e1.code+"\n"+RESULT.addr+"="+e.addr+p+e1.addr;
 				:}| Expression:e MINUS:m Expression:e1
 				{:
-					RESULT = e+m+e1;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = e.code+"\n"+e1.code+"\n"+RESULT.addr+"="+e.addr+m+e1.addr;
 				:}| Expression:e ASTRISK:a Expression:e1
 				{:
-					RESULT = e+a+e1;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = e.code+"\n"+e1.code+"\n"+RESULT.addr+"="+e.addr+a+e1.addr;
 				:}| Expression:e SLASH:s Expression:e1
 				{:
-					RESULT = e+s+e1;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = e.code+"\n"+e1.code+"\n"+RESULT.addr+"="+e.addr+s+e1.addr;
 				:}| Expression:e PERCENT:p Expression:e1
 				{:
-					RESULT = e+p+e1;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = e.code+"\n"+e1.code+"\n"+RESULT.addr+"="+e.addr+p+e1.addr;
 				:}| Expression:e SHIFT_LEFT:s Expression:e1
 				{:
-					System.out.println(e1);
-					RESULT = e+s+e1;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = e.code+"\n"+e1.code+"\n"+RESULT.addr+"="+e.addr+s+e1.addr;
 				:}| Expression:e SHIFT_RIGHT:s Expression:e1
 				{:
-					System.out.println("shift "+e1);
-					RESULT = e+s+e1;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = e.code+"\n"+e1.code+"\n"+RESULT.addr+"="+e.addr+s+e1.addr;
 				:}| Expression:e AMBERSAND:a Expression:e1
 				{:
-					RESULT = e+a+e1;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = e.code+"\n"+e1.code+"\n"+RESULT.addr+"="+e.addr+a+e1.addr;
 				:}| Expression:e EXCLAMATION:ex Expression:e1
 				{:
-					RESULT = e+ex+e1;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = e.code+"\n"+e1.code+"\n"+RESULT.addr+"="+e.addr+ex+e1.addr;
 				:};
 UnaryExpr ::= 	PrimaryExpr:p
 				{:
-					System.out.println("primary expr from unary expression "+p);
 					RESULT = p;
 				:}
 				| MINUS:m UnaryExpr:u
 				{:
-					RESULT = m+u;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = RESULT.addr+"="+m+u.addr;
 				:}| EXCLAMATION:e UnaryExpr:u
 				{:
-					RESULT = e+u;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = RESULT.addr+"="+e+u.addr;
 				:}| ASTRISK:a UnaryExpr:u
 				{:
-					RESULT= a+u;
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					RESULT.code = RESULT.addr+"="+a+u.addr;
 				:};
 Operand ::= 	Literal:l
 				{:
-					RESULT=l;
+					RESULT = new Expr();
+					RESULT.addr=l;
 					System.out.println("literal from operand: "+l);
 				:}
 				| OperandName:o
 				{:
+					RESULT = new Expr();
 					System.out.println("operand name from operand: "+o);
-					RESULT =o;
+					RESULT.addr =o;
 				:}
 				| OPEN_PARAN Expression:e CLOSE_PARAN
 				{:
@@ -166,18 +197,16 @@ FunctionLit ::= FUNC Function:f
 				:};
 PrimaryExpr ::=  Operand:o
 				{:
-					System.out.println("operand from primary expression "+o);
-					RESULT = o;
-				:}
-				| PrimaryExpr:p Selector:s
-				{:
-					System.out.println("selector from primaryExpr");
-					RESULT=p+s;
+					System.out.println("operand "+o);
+					RESULT= o;
 				:}
 				| PrimaryExpr:p Arguments:a
 				{:
-					System.out.println("arguments from primaryExpr");
-					RESULT=p+a+"\n"+"pop_params;"+"\n";
+					RESULT = new Expr();
+					RESULT.addr = RESULT.genCount();
+					if(p.addr.equals(".fmt.Println"))
+						p.addr="call Println";
+					RESULT.code = a+"\n"+RESULT.addr+"="+p.addr;
 				:};
 Selector ::=  DOT:d IDENTIFIER:i
 				{:
@@ -209,7 +238,7 @@ Block ::= 		OPEN_CURLY StatementList:s CLOSE_CURLY
 				:};
 StatementList ::= Statement:s StatementList:sl
 				{:
-					RESULT="\n"+s+sl;
+					RESULT=s+"\n"+sl;
 				:}| {: RESULT=""; :} ;
 Statement ::= 	Declaration:d
 				{:
@@ -310,12 +339,12 @@ const_spec_zero_more ::= ConstSpec:c SEMI_COLON const_spec_zero_more:cz {: RESUL
 ConstSpec ::= 	IDENTIFIER:i Type EQUAL Expression:e
 				{:
 					System.out.println(i +" = "+ e);
-					RESULT = i +" = "+ e;
+					RESULT = e.code+"\n"+i +" = "+ e.addr;
 				:}
 				|IDENTIFIER:i EQUAL Expression:e
 				{:
 					System.out.println(i +" = "+ e);
-					RESULT = i +" = "+ e;
+					RESULT = e.code+"\n"+i +" = "+ e.addr;
 				:}
 				|IDENTIFIER:i
 				{:
@@ -333,7 +362,7 @@ VarDecl ::= 	VAR VarSpec:v
 var_spec_zero_more ::= VarSpec:v SEMI_COLON var_spec_zero_more:vz {: RESULT = v+vz; :} | {: RESULT=""; :};
 VarSpec ::= 	IDENTIFIER:i Type EQUAL Expression:e
 				{:
-					RESULT = i+"="+e;
+					RESULT = e.code+"\n"+i+"="+e.addr;
 				:}
 				| IDENTIFIER:i Type:t
 				{:
@@ -341,11 +370,11 @@ VarSpec ::= 	IDENTIFIER:i Type EQUAL Expression:e
 				:}
 				| IDENTIFIER:i EQUAL Expression:e
 				{:
-					RESULT = i+"="+e;
+					RESULT = e.code+"\n"+i+"="+e.addr;
 				:};
 SimpleStmt ::= 	ExpressionStmt:e
 				{:
-					RESULT = e;
+					RESULT = e.code;
 				:}
 				| IncDecStmt:i
 				{:
@@ -365,11 +394,11 @@ ExpressionStmt ::= Expression:e
 				:};
 IncDecStmt ::= Expression:e INCREMENT:i
 				{:
-					RESULT = e+i;
+					RESULT = e.code+e.addr+"="+e.addr+"+1";
 				:}
 				| Expression:e DECREMENT:d
 				{:
-					RESULT = e+d;
+					RESULT = e.code+e.addr+"="+e.addr+"-1";
 				:};
 Assignment ::= ExpressionList:e PLUS:p EQUAL:eq ExpressionList:el
 				{:
@@ -393,36 +422,36 @@ Assignment ::= ExpressionList:e PLUS:p EQUAL:eq ExpressionList:el
 					RESULT = e+s+eq+el;
 				:}|ExpressionList:e EQUAL:eq ExpressionList:el
 				{:
-					RESULT = e+eq+el;
+					RESULT = el+"\n"+e+"="+el;
 				:};
 ShortVarDecl ::= IdentifierList:i COLON_EQUAL:c Expression:e
 				{:
-					System.out.println("short var "+e);
-					RESULT=i+"="+e;
+					System.out.println("short var "+e.code);
+					RESULT=e.code+"\n"+i+"="+e.addr;
 				:};
 IfStmt ::= 		IF:i SimpleStmt:s SEMI_COLON Expression:e Block:b ELSE:el IfStmt:i2
 				{:
-					RESULT = i+" "+s+e+b+el+i2;
+					RESULT = i+" "+s+e.addr+b+el+i2;
 				:}
 				|IF:i SimpleStmt:s SEMI_COLON Expression:e Block:b ELSE:el Block:b1
 				{:
-					RESULT = i+" "+s+e+b+el+b1;
+					RESULT = i+" "+s+e.addr+b+el+b1;
 				:}
 				|IF:i SimpleStmt:s SEMI_COLON Expression:e Block:b
 				{:
-					RESULT = i+" "+s+e+b;
+					RESULT = i+" "+s+e.addr+b;
 				:}
 				| IF:i Expression:e Block:b ELSE:el IfStmt:i2
 				{:
-					RESULT = i+" "+e+b+el+i2;
+					RESULT = i+" "+e.addr+b+el+i2;
 				:}
 				| IF:i Expression:e Block:b ELSE:el Block:b1
 				{:
-					RESULT = i+" "+e+b+el+b1;
+					RESULT = i+" "+e.addr+b+el+b1;
 				:}
 				| IF:i Expression:e Block:b
 				{:
-					RESULT = i+" "+e+b;
+					RESULT = i+" "+e.addr+b;
 				:};
 SwitchStmt ::= 	ExprSwitchStmt:e
 				{:
@@ -430,11 +459,11 @@ SwitchStmt ::= 	ExprSwitchStmt:e
 				:};
 ExprSwitchStmt ::= SWITCH:s SimpleStmt:ss SEMI_COLON Expression:e OPEN_CURLY Expr_case_clause_zero_more:ez CLOSE_CURLY
 				{:
-					RESULT = s+" "+ss+e+"\n"+ez;
+					RESULT = s+" "+ss+e.code+"\n"+ez;
 				:}
 				|SWITCH:s Expression:e OPEN_CURLY Expr_case_clause_zero_more:ez CLOSE_CURLY
 				{:
-					RESULT = s+" "+e+"\n"+ez;
+					RESULT = s+" "+e.code+"\n"+ez;
 				:}
 				| SWITCH:s SimpleStmt:ss SEMI_COLON OPEN_CURLY Expr_case_clause_zero_more:ez CLOSE_CURLY
 				{:
@@ -451,7 +480,7 @@ ExprCaseClause ::= ExprSwitchCase:e COLON StatementList:s
 				:};
 ExprSwitchCase ::= CASE:c Expression:e
 				{:
-					RESULT = c+" "+e;
+					RESULT = c+" "+e.code;
 				:}
 				| DEFAULT:d
 				{:
@@ -463,7 +492,7 @@ ForStmt ::= 	FOR:f ForClause:fc Block:b
 				:};
 Condition ::= 	Expression:e
 				{:
-					RESULT= e;
+					RESULT= e.code;
 				:};
 ForClause ::= 	InitStmt:i SEMI_COLON Condition:c SEMI_COLON PostStmt:p
 				{:
@@ -616,10 +645,10 @@ ReturnStmt ::= 	RETURN:r ExpressionList:e
 				{: 
 				 	 RESULT="";
 				:};
-expression_zero_more ::= COMMA:c Expression:e expression_zero_more:ez {: RESULT=c+e+ez; :} | {: RESULT=""; :};
+expression_zero_more ::= COMMA:c Expression:e expression_zero_more:ez {: RESULT=c+e.addr+ez; :} | {: RESULT=""; :};
 ExpressionList ::= 	Expression:e expression_zero_more:ez 
 				{: 
-					System.out.println("expression list "+ez);
-				    RESULT=e+ez;
+					System.out.println("expression list "+e.addr);
+				    RESULT=e.addr+ez;
 				:};
 
