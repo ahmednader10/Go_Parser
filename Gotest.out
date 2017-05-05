@@ -1,33 +1,65 @@
 
-s = "constant"
+add:
+begin_func;t0
+
+t0=x+y
+x=t0
+
+t0=x+y
+return x
+
+end_func;
+swap:
+begin_func;return y,x
+
+end_func;
+split:
+begin_func;t2
+
+t1=sum*4
+
+t2=t1/9
+x=t2
+
+t1=sum*4
+
+t2=t1/9
+t3
+
+t3=sum-x
+y=t3
+
+t3=sum-x
+return x,y
+
+end_func;
 main:
 begin_func;
-push_params: s
-t0=call Println
+push_params: `hello`,"world		"
+t4=swap
+pop_params;
+a,b=t4
 
-n = 5000
+push_params: a,b
+t5=call Println
+pop_params;
 
+push_params: 4,13
+t6=add
+pop_params;
+x=t6
 
-t1=3/n
-d=t1
+push_params: x
+t7=call Println
+pop_params;
 
-push_params: d
-t2=call Println
+push_params: 17
+t8=split
+pop_params;
+z,y=t8
 
-
-
-t3=n*2
-t4=d-t3
-
-t5=t4+d
-e=t5
-t6=e!=5
-t=t6
-
-m = 16
-
-
-t7=m>>2
-mShifted=t7
+push_params: z,y
+t9=call Println
+pop_params;
 
 end_func;

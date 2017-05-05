@@ -93,6 +93,10 @@ Expression ::= UnaryExpr:u
 					RESULT.code = e.code+"\n"+e1.code+"\n"+RESULT.addr+"="+e.addr+a+e1.addr;
 				:}| Expression:e PLUS:p Expression:e1
 				{:
+					System.out.println("plus1 :" +e.addr);
+					System.out.println("plus2 :" +e.code);
+					System.out.println("plus3 :" +e1.addr);
+					System.out.println("plus4 :" +e1.code);
 					RESULT = new Expr();
 					RESULT.addr = RESULT.genCount();
 					RESULT.code = e.code+"\n"+e1.code+"\n"+RESULT.addr+"="+e.addr+p+e1.addr;
@@ -197,16 +201,16 @@ FunctionLit ::= FUNC Function:f
 				:};
 PrimaryExpr ::=  Operand:o
 				{:
-					System.out.println("operand "+o);
+					System.out.println("operand "+o.addr);
 					RESULT= o;
 				:}
 				| PrimaryExpr:p Arguments:a
 				{:
 					RESULT = new Expr();
 					RESULT.addr = RESULT.genCount();
-					if(p.addr.equals(".fmt.Println"))
+					if(p.addr.equalsIgnoreCase(".fmt.Println"))
 						p.addr="call Println";
-					RESULT.code = a+"\n"+RESULT.addr+"="+p.addr;
+					RESULT.code = a+"\n"+RESULT.addr+"="+p.addr+"\n"+"pop_params;";
 				:};
 Selector ::=  DOT:d IDENTIFIER:i
 				{:
@@ -422,6 +426,8 @@ Assignment ::= ExpressionList:e PLUS:p EQUAL:eq ExpressionList:el
 					RESULT = e+s+eq+el;
 				:}|ExpressionList:e EQUAL:eq ExpressionList:el
 				{:
+					System.out.println("expression list 1 "+e);
+					System.out.println("expression list 2 "+el);
 					RESULT = el+"\n"+e+"="+el;
 				:};
 ShortVarDecl ::= IdentifierList:i COLON_EQUAL:c Expression:e
@@ -431,27 +437,39 @@ ShortVarDecl ::= IdentifierList:i COLON_EQUAL:c Expression:e
 				:};
 IfStmt ::= 		IF:i SimpleStmt:s SEMI_COLON Expression:e Block:b ELSE:el IfStmt:i2
 				{:
-					RESULT = i+" "+s+e.addr+b+el+i2;
+					Expr ex = new Expr();
+					RESULT = s+"\n"+e.code+"\n"+i+" "+e.addr +" Goto "+ex.genIfCount()+"\n"+"Goto "+ex.genIfCount()
+					+"\n"+"L"+((ex.ifCounter)-1)+":"+b+"\n"+e.genEndIfCount()+"\n"+"L"+ex.ifCounter+":"+i2+"\n"+"LL"+((ex.ifCounter)-1)+":";
 				:}
 				|IF:i SimpleStmt:s SEMI_COLON Expression:e Block:b ELSE:el Block:b1
 				{:
-					RESULT = i+" "+s+e.addr+b+el+b1;
+					Expr ex = new Expr();
+					RESULT = s+"\n"+e.code+"\n"+i+" "+e.addr+s +" Goto "+ex.genIfCount()+"\n"+"Goto "+ex.genIfCount()
+					+"\n"+"L"+((ex.ifCounter)-1)+":"+b+"\n"+e.genEndIfCount()+"\n"+"L"+ex.ifCounter+":"+b1+"\n"+"LL"+((ex.ifCounter)-1)+":";
 				:}
 				|IF:i SimpleStmt:s SEMI_COLON Expression:e Block:b
 				{:
-					RESULT = i+" "+s+e.addr+b;
+					Expr ex = new Expr();
+					RESULT = s+"\n"+e.code+"\n"+i+" "+e.addr+s +" Goto "+ex.genIfCount()+"\n"+"Goto "+ex.genIfCount()
+					+"\n"+"L"+((ex.ifCounter)-1)+":"+b;
 				:}
 				| IF:i Expression:e Block:b ELSE:el IfStmt:i2
 				{:
-					RESULT = i+" "+e.addr+b+el+i2;
+					Expr ex = new Expr();
+					RESULT = e.code+"\n"+i+" " +e.addr+" Goto "+ex.genIfCount()+"\n"+"Goto "+ex.genIfCount()
+					+"\n"+"L"+((ex.ifCounter)-1)+":"+b+"\n"+e.genEndIfCount()+"\n"+"L"+ex.ifCounter+":"+i2+"\n"+"LL"+((ex.ifCounter)-1)+":";
 				:}
 				| IF:i Expression:e Block:b ELSE:el Block:b1
 				{:
-					RESULT = i+" "+e.addr+b+el+b1;
+					Expr ex = new Expr();
+					RESULT = e.code+"\n"+i+" " +e.addr+" Goto "+ex.genIfCount()+"\n"+"Goto "+ex.genIfCount()
+					+"\n"+"L"+((ex.ifCounter)-1)+":"+b+"\n"+e.genEndIfCount()+"\n"+"L"+ex.ifCounter+":"+b1+"\n"+"LL"+((ex.ifCounter)-1)+":";
 				:}
 				| IF:i Expression:e Block:b
 				{:
-					RESULT = i+" "+e.addr+b;
+					Expr ex = new Expr();
+					RESULT = e.code+"\n"+i+" " +e.addr+" Goto "+ex.genIfCount()+"\n"+"Goto "+ex.genIfCount()
+					+"\n"+"L"+((ex.ifCounter)-1)+":"+b+"\n"+"L"+ex.ifCounter+":";
 				:};
 SwitchStmt ::= 	ExprSwitchStmt:e
 				{:
@@ -645,10 +663,11 @@ ReturnStmt ::= 	RETURN:r ExpressionList:e
 				{: 
 				 	 RESULT="";
 				:};
-expression_zero_more ::= COMMA:c Expression:e expression_zero_more:ez {: RESULT=c+e.addr+ez; :} | {: RESULT=""; :};
+expression_zero_more ::= COMMA:c Expression:e expression_zero_more:ez {: RESULT=c+e.addr+e.code+ez; :} | {: RESULT=""; :};
 ExpressionList ::= 	Expression:e expression_zero_more:ez 
 				{: 
-					System.out.println("expression list "+e.addr);
-				    RESULT=e.addr+ez;
+					System.out.println("expression list addr "+e.addr);
+					System.out.println("expression list code "+e.code);
+				    RESULT=e.addr+e.code+ez;
 				:};
 

@@ -934,6 +934,10 @@ class CUP$parser$actions {
 		int e1right = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Expr e1 = (Expr)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
+					System.out.println("plus1 :" +e.addr);
+					System.out.println("plus2 :" +e.code);
+					System.out.println("plus3 :" +e1.addr);
+					System.out.println("plus4 :" +e1.code);
 					RESULT = new Expr();
 					RESULT.addr = RESULT.genCount();
 					RESULT.code = e.code+"\n"+e1.code+"\n"+RESULT.addr+"="+e.addr+p+e1.addr;
@@ -1315,7 +1319,7 @@ class CUP$parser$actions {
 		int oright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Expr o = (Expr)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-					System.out.println("operand "+o);
+					System.out.println("operand "+o.addr);
 					RESULT= o;
 				
               CUP$parser$result = parser.getSymbolFactory().newSymbol("PrimaryExpr",68, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1335,9 +1339,9 @@ class CUP$parser$actions {
 		
 					RESULT = new Expr();
 					RESULT.addr = RESULT.genCount();
-					if(p.addr.equals(".fmt.Println"))
+					if(p.addr.equalsIgnoreCase(".fmt.Println"))
 						p.addr="call Println";
-					RESULT.code = a+"\n"+RESULT.addr+"="+p.addr;
+					RESULT.code = a+"\n"+RESULT.addr+"="+p.addr+"\n"+"pop_params;";
 				
               CUP$parser$result = parser.getSymbolFactory().newSymbol("PrimaryExpr",68, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2236,6 +2240,8 @@ class CUP$parser$actions {
 		int elright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		String el = (String)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
+					System.out.println("expression list 1 "+e);
+					System.out.println("expression list 2 "+el);
 					RESULT = el+"\n"+e+"="+el;
 				
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Assignment",23, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -2286,7 +2292,9 @@ class CUP$parser$actions {
 		int i2right = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		String i2 = (String)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-					RESULT = i+" "+s+e.addr+b+el+i2;
+					Expr ex = new Expr();
+					RESULT = s+"\n"+e.code+"\n"+i+" "+e.addr +" Goto "+ex.genIfCount()+"\n"+"Goto "+ex.genIfCount()
+					+"\n"+"L"+((ex.ifCounter)-1)+":"+b+"\n"+e.genEndIfCount()+"\n"+"L"+ex.ifCounter+":"+i2+"\n"+"LL"+((ex.ifCounter)-1)+":";
 				
               CUP$parser$result = parser.getSymbolFactory().newSymbol("IfStmt",25, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-6)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2315,7 +2323,9 @@ class CUP$parser$actions {
 		int b1right = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		String b1 = (String)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-					RESULT = i+" "+s+e.addr+b+el+b1;
+					Expr ex = new Expr();
+					RESULT = s+"\n"+e.code+"\n"+i+" "+e.addr+s +" Goto "+ex.genIfCount()+"\n"+"Goto "+ex.genIfCount()
+					+"\n"+"L"+((ex.ifCounter)-1)+":"+b+"\n"+e.genEndIfCount()+"\n"+"L"+ex.ifCounter+":"+b1+"\n"+"LL"+((ex.ifCounter)-1)+":";
 				
               CUP$parser$result = parser.getSymbolFactory().newSymbol("IfStmt",25, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-6)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2338,7 +2348,9 @@ class CUP$parser$actions {
 		int bright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		String b = (String)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-					RESULT = i+" "+s+e.addr+b;
+					Expr ex = new Expr();
+					RESULT = s+"\n"+e.code+"\n"+i+" "+e.addr+s +" Goto "+ex.genIfCount()+"\n"+"Goto "+ex.genIfCount()
+					+"\n"+"L"+((ex.ifCounter)-1)+":"+b;
 				
               CUP$parser$result = parser.getSymbolFactory().newSymbol("IfStmt",25, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-4)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2364,7 +2376,9 @@ class CUP$parser$actions {
 		int i2right = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		String i2 = (String)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-					RESULT = i+" "+e.addr+b+el+i2;
+					Expr ex = new Expr();
+					RESULT = e.code+"\n"+i+" " +e.addr+" Goto "+ex.genIfCount()+"\n"+"Goto "+ex.genIfCount()
+					+"\n"+"L"+((ex.ifCounter)-1)+":"+b+"\n"+e.genEndIfCount()+"\n"+"L"+ex.ifCounter+":"+i2+"\n"+"LL"+((ex.ifCounter)-1)+":";
 				
               CUP$parser$result = parser.getSymbolFactory().newSymbol("IfStmt",25, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-4)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2390,7 +2404,9 @@ class CUP$parser$actions {
 		int b1right = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		String b1 = (String)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-					RESULT = i+" "+e.addr+b+el+b1;
+					Expr ex = new Expr();
+					RESULT = e.code+"\n"+i+" " +e.addr+" Goto "+ex.genIfCount()+"\n"+"Goto "+ex.genIfCount()
+					+"\n"+"L"+((ex.ifCounter)-1)+":"+b+"\n"+e.genEndIfCount()+"\n"+"L"+ex.ifCounter+":"+b1+"\n"+"LL"+((ex.ifCounter)-1)+":";
 				
               CUP$parser$result = parser.getSymbolFactory().newSymbol("IfStmt",25, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-4)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -2410,7 +2426,9 @@ class CUP$parser$actions {
 		int bright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		String b = (String)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-					RESULT = i+" "+e.addr+b;
+					Expr ex = new Expr();
+					RESULT = e.code+"\n"+i+" " +e.addr+" Goto "+ex.genIfCount()+"\n"+"Goto "+ex.genIfCount()
+					+"\n"+"L"+((ex.ifCounter)-1)+":"+b+"\n"+"L"+ex.ifCounter+":";
 				
               CUP$parser$result = parser.getSymbolFactory().newSymbol("IfStmt",25, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -3211,7 +3229,7 @@ class CUP$parser$actions {
 		int ezleft = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int ezright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		String ez = (String)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT=c+e.addr+ez; 
+		 RESULT=c+e.addr+e.code+ez; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("expression_zero_more",63, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -3236,8 +3254,9 @@ class CUP$parser$actions {
 		int ezright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		String ez = (String)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		 
-					System.out.println("expression list "+e.addr);
-				    RESULT=e.addr+ez;
+					System.out.println("expression list addr "+e.addr);
+					System.out.println("expression list code "+e.code);
+				    RESULT=e.addr+e.code+ez;
 				
               CUP$parser$result = parser.getSymbolFactory().newSymbol("ExpressionList",64, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
